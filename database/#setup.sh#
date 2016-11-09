@@ -1,4 +1,4 @@
-#!/bin/bash
+
 
 mypath=`realpath $0`
 mybase=`dirname $mypath`
