@@ -1,3 +1,3 @@
-SQLALCHEMY_DATABASE_URI = 'postgresql://vagrant:dbpasswd@localhost/beers'
+SQLALCHEMY_DATABASE_URI = 'postgresql://roxanneelisebaker:dbpasswd@localhost/example'
 SQLALCHEMY_ECHO = True
 DEBUG = True
