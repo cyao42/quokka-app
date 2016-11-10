@@ -7,12 +7,25 @@ app = Flask(__name__)
 app.secret_key = 's3cr3t'
 app.config.from_object('config')
 db = SQLAlchemy(app, session_options={'autocommit': False})
+currentuser = None
 
-@app.route('/')
-def all_drinkers():
-    drinkers = db.session.query(models.Drinker).all()
-    schoolusers = db.session.query(models.SchoolUser).all()
-    return render_template('all-drinkers.html', drinkers=drinkers, schoolusers=schoolusers)
+@app.route('/', methods=['GET', 'POST'])
+def login_user():
+    global currentuser
+    form = forms.UserLoginFormFactory.form()
+    user = currentuser
+    if form.validate_on_submit():
+        try:
+            user = db.session.query(models.SchoolUser)\
+                          .filter(models.SchoolUser.email == form.email.data).first()
+            currentuser = user
+            form.errors.pop('database', None)
+            return redirect('/')
+        except BaseException as e:
+            form.errors['database'] = str(e)
+            return render_template('all-drinkers.html', form=form)
+    else:
+        return render_template('all-drinkers.html', form=form)
 
 @app.route('/drinker/<name>')
 def drinker(name):

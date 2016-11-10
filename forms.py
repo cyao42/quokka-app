@@ -1,6 +1,14 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, BooleanField, IntegerField, SelectField
+from wtforms import StringField, BooleanField, IntegerField, SelectField, PasswordField
 from wtforms.validators import DataRequired
+
+class UserLoginFormFactory:
+    @staticmethod
+    def form():
+        class F(FlaskForm):
+            email = StringField(default='')
+            password = PasswordField(default='')
+        return F()
 
 class UserNewFormFactory:
     @staticmethod
