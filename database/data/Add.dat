@@ -1,1 +1,25 @@
-1,You are approved!,y
+1,2,Can I join?,yes,80,85
+2,7,Team up?,yes,44,86
+3,11,Join the team?,yes,27,26
+4,15,Join my team!,yes,54,52
+5,15,Can I join?,yes,52,55
+6,15,Can I join?,yes,52,72
+7,20,Can I join?,yes,22,48
+8,20,Team up?,yes,22,64
+9,20,Join my team!,yes,71,22
+10,27,Can I join?,yes,41,57
+11,27,Can I join?,yes,41,74
+12,27,Join the team?,yes,89,41
+13,28,Can I join?,yes,51,83
+14,29,Team up?,yes,30,31
+15,29,Team up?,yes,30,46
+16,32,Can I join?,yes,20,23
+17,37,Join the team?,yes,95,50
+18,37,Team up?,yes,50,96
+19,37,Team up?,yes,50,98
+20,39,Team up?,yes,45,84
+21,19,Can I join?,no,28,25
+22,19,Join the team?,no,29,28
+23,31,Team up?,no,91,92
+24,31,Can I join?,no,91,93
+25,5,Can I join?,no,59,67
