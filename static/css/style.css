@@ -1,5 +1,22 @@
 body {
-    color: black;
-    background: white;
-    font-family: Verdana, Arial, Helvetica, sans-serif;
+    color: blue;
+    background: grey;
+    font-family: Helvetica, sans-serif;
+
+    .form{
+       display: inline-block;
+    }
+}
+
+title{
+    color: black; 
+    font-family: Courier New;
+    size: 40;
+    .subtitle{
+	size: 14;
+    }
+}
+
+.form{
+    display: inline-block;
 }
