@@ -7,6 +7,22 @@ class SchoolUser(db.Model):
     name = db.Column('name', db.String(256))
     phone = db.Column('phone', db.String(10))
     email = db.Column('email', db.String(256))
+    @staticmethod
+    def addNew(name, phone, email, user_type):
+        try:
+            u_id = db.session.query(SchoolUser).count()+1
+            db.session.execute('INSERT INTO schooluser VALUES(:u_id, :name, :phone, :email)',
+                               dict(u_id=u_id, name=name, phone=phone, email=email))
+            if user_type == 'pro':
+                db.session.execute('INSERT INTO professor VALUES(:u_id, :name, :phone, :email)',
+                    dict(u_id=u_id, name=name, phone=phone, email=email))  
+            else:
+                db.session.execute('INSERT INTO student VALUES(:u_id, :name, :phone, :email)',
+                    dict(u_id=u_id, name=name, phone=phone, email=email))
+            db.session.commit()
+        except Exception as e:
+            db.session.rollback()
+            raise e
 
 class Professor(db.Model):
     __tablename__ = 'professor'
@@ -143,6 +159,24 @@ class Drinker(db.Model):
     address = db.Column('address', db.String(20))
     likes = orm.relationship('Likes')
     frequents = orm.relationship('Frequents')
+    @staticmethod
+    def addNew(name, address, beers_liked, bars_frequented):
+        try:
+            db.session.execute('INSERT INTO drinker VALUES(:name, :address)',
+                               dict(name=name, address=address))
+            for beer in beers_liked:
+                db.session.execute('INSERT INTO likes VALUES(:drinker, :beer)',
+                                   dict(drinker=name, beer=beer))
+            for bar, times_a_week in bars_frequented:
+                db.session.execute('INSERT INTO frequents'
+                                   ' VALUES(:drinker, :bar, :times_a_week)',
+                                   dict(drinker=name, bar=bar,
+                                        times_a_week=times_a_week))
+            db.session.commit()
+        except Exception as e:
+            db.session.rollback()
+            raise e
+
     @staticmethod
     def edit(old_name, name, address, beers_liked, bars_frequented):
         try:

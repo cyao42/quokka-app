@@ -19,7 +19,7 @@ CREATE TABLE Student
  email VARCHAR(256) NOT NULL,
  first_major VARCHAR(256), 
  second_major VARCHAR(256),
- grad_year INTEGER NOT NULL CHECK (grad_year > 0)
+ grad_year INTEGER NOT CHECK (grad_year > 0)
 );
 
 CREATE TABLE SchoolGroup
