@@ -27,4 +27,7 @@
 </form>
 <hr/>
 <p><a href="{{url_for('new_user')}}">Register</a></p>
+{% if user %}
+You are logged in as {{user.email}}
+{% endif %}
 {% endblock %}

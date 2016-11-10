@@ -23,9 +23,9 @@ def login_user():
             return redirect('/')
         except BaseException as e:
             form.errors['database'] = str(e)
-            return render_template('all-drinkers.html', form=form)
+            return render_template('all-drinkers.html', form=form, user=currentuser)
     else:
-        return render_template('all-drinkers.html', form=form)
+        return render_template('all-drinkers.html', form=form, user=currentuser)
 
 @app.route('/drinker/<name>')
 def drinker(name):
