@@ -144,6 +144,24 @@ class Drinker(db.Model):
     likes = orm.relationship('Likes')
     frequents = orm.relationship('Frequents')
     @staticmethod
+    def addNew(name, address, beers_liked, bars_frequented):
+        try:
+            db.session.execute('INSERT INTO drinker VALUES(:name, :address)',
+                               dict(name=name, address=address))
+            for beer in beers_liked:
+                db.session.execute('INSERT INTO likes VALUES(:drinker, :beer)',
+                                   dict(drinker=name, beer=beer))
+            for bar, times_a_week in bars_frequented:
+                db.session.execute('INSERT INTO frequents'
+                                   ' VALUES(:drinker, :bar, :times_a_week)',
+                                   dict(drinker=name, bar=bar,
+                                        times_a_week=times_a_week))
+            db.session.commit()
+        except Exception as e:
+            db.session.rollback()
+            raise e
+
+    @staticmethod
     def edit(old_name, name, address, beers_liked, bars_frequented):
         try:
             db.session.execute('DELETE FROM likes WHERE drinker = :name',

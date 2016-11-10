@@ -2,6 +2,42 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, BooleanField, IntegerField
 from wtforms.validators import DataRequired
 
+class DrinkerNewFormFactory:
+    @staticmethod
+    def form(beers, bars):
+        class F(FlaskForm):
+            name = StringField(default='')
+            address = StringField(default='')
+            @staticmethod
+            def beer_field_name(index):
+                return 'beer_{}'.format(index)
+            def beer_fields(self):
+                for i, beer in enumerate(beers):
+                    yield beer.name, getattr(self, F.beer_field_name(i))
+            def get_beers_liked(self):
+                for beer, field in self.beer_fields():
+                    if field.data:
+                        yield beer
+            @staticmethod
+            def bar_field_name(index):
+                return 'bar_{}'.format(index)
+            def bar_fields(self):
+                for i, bar in enumerate(bars):
+                    yield bar.name, getattr(self, F.bar_field_name(i))
+            def get_bars_frequented(self):
+                for bar, field in self.bar_fields():
+                    if field.data != 0:
+                        yield bar, field.data
+        for i, beer in enumerate(beers):
+            field_name = F.beer_field_name(i)
+            default = None
+            setattr(F, field_name, BooleanField(default=default))
+        for i, bar in enumerate(bars):
+            field_name = F.bar_field_name(i)
+            default = 0
+            setattr(F, field_name, IntegerField(default=default))
+        return F()
+
 class DrinkerEditFormFactory:
     @staticmethod
     def form(drinker, beers, bars):
