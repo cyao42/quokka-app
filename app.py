@@ -11,7 +11,8 @@ db = SQLAlchemy(app, session_options={'autocommit': False})
 @app.route('/')
 def all_drinkers():
     drinkers = db.session.query(models.Drinker).all()
-    return render_template('all-drinkers.html', drinkers=drinkers)
+    schoolusers = db.session.query(models.SchoolUser).all()
+    return render_template('all-drinkers.html', drinkers=drinkers, schoolusers=schoolusers)
 
 @app.route('/drinker/<name>')
 def drinker(name):
@@ -55,6 +56,20 @@ def new_drinker():
     else:
         return render_template('new-drinker.html', form=form)
 
+@app.route('/new-user/', methods=['GET', 'POST'])
+def new_user():
+    form = forms.UserNewFormFactory.form()
+    if form.validate_on_submit():
+        try:
+            form.errors.pop('database', None)
+            models.SchoolUser.addNew(form.name.data, form.phone.data,
+                                form.email.data, form.user_type.data)
+            return redirect('/')
+        except BaseException as e:
+            form.errors['database'] = str(e)
+            return render_template('new-user.html', form=form)
+    else:
+        return render_template('new-user.html', form=form)
 
 @app.template_filter('pluralize')
 def pluralize(number, singular='', plural='s'):

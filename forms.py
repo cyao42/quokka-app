@@ -1,6 +1,16 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, BooleanField, IntegerField
+from wtforms import StringField, BooleanField, IntegerField, SelectField
 from wtforms.validators import DataRequired
+
+class UserNewFormFactory:
+    @staticmethod
+    def form():
+        class F(FlaskForm):
+            name = StringField(default='')
+            phone = StringField(default='')
+            email = StringField(default='')
+            user_type = SelectField('User Type', choices=[('pro', 'Professor'), ('stu', 'Student')])
+        return F()
 
 class DrinkerNewFormFactory:
     @staticmethod

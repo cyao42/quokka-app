@@ -6,9 +6,16 @@
   <li><a href="{{url_for('drinker', name=drinker.name)}}">{{drinker.name}}</a></li>
   {% endfor %}
 </ul>
+All Users
+<ul>
+  {% for user in schoolusers %}
+  <li>{{user.name}}</li>
+  {% endfor %}
+</ul>
 <hr/>
 <p>{{drinkers|length}} drinker{{drinkers|length|pluralize}}
   found in the database.</p>
 <p><a href="{{url_for('new_drinker')}}">Add New</a>
   Drinker.</p>
+<p><a href="{{url_for('new_user')}}">Add New User</a></p>
 {% endblock %}
