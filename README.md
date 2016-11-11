@@ -21,6 +21,6 @@ We navigate to the one level above the quokka-app folder and run the following c
 	~../quokka-app/database/setup.sh
 The set up executable uses the load.sql and create.sql files to create the database schema and then load the large production data files, which are all .dat files located in a data folder. 
 
-* Node: There is a small caveat. This process requires a small config change depending on if the developer is running/setting up the database on google cloud or on vagrant. We are working to make this process more general. 
+* Note: There is a small caveat. This process requires a small config change depending on if the developer is running/setting up the database on google cloud or on vagrant. We are working to make this process more general. 
 
 The production data files were all custom generated using generatedata.com for some initial random values. The data was produced to fit the schema, and thus no code was required to extract data into a usable form. The data was made to have many dependencies across tables and thus give interesting results when running our sequel commands. These dependencies were complex to set up the initial data and required human effort rather than code. SQL code was updated after the data was generated to fix some inconsistencies. In addition, the TextStripperForData.java file was used to properly convert and print .csv file text to a .dat usable format.
