@@ -1,0 +1,29 @@
+% extends 'layout.html' %}
+{% block heading %}New Group Information: {% endblock %}
+{% block content %}
+<form action="{{url_for('new_group')}}" method="POST">
+  {{form.csrf_token}}
+  <p>
+    Name: {{form.name}}
+    {% if form.name.errors %}
+    <ul>{% for error in form.name.errors %}<li>{{error}}</li>{% endfor %}</ul>
+    {% endif %}
+  </p>
+  <p>
+    Course: {{form.course}}
+    {% if form.course.errors %}
+    <ul>{% for error in form.course.errors %}<li>{{error}}</li>{% endfor %}</ul>
+    {% endif %}
+  </p>
+<!--   <p>
+    Assignment: {{form.assignment}}
+    {% if form.assignment.errors %}
+    <ul>{% for error in form.assignment.errors %}<li>{{error}}</li>{% endfor %}</ul>
+    {% endif %}
+  </p> -->
+  <hr/>
+  <input type="reset" value="Reset"/>
+  <input type="submit" value="Submit"/>
+  {% if 'database' in form.errors %}<p>{{form.errors['database']}}</p>{% endif %}
+</form>
+{% endblock %}
