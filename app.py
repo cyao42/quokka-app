@@ -27,6 +27,37 @@ def login_user():
     else:
         return render_template('all-drinkers.html', form=form, user=currentuser)
 
+@app.route('/new-group', methods=['GET', 'POST'])
+def new_group():
+    global currentuser
+    student_sections = db.session.query(models.Section)\
+        .filter(models.RegisteredWith.u_id = currentuser.u_id and
+            models.RegisteredWith.section_number = models.Section.section_number and
+            models.RegisteredWith.course_code = models.Section.course_code and
+            models.RegisteredWith.course_semester = models.Section.course_semester and
+            models.RegisteredWith.university_name = models.Section.university_name and
+            models.RegisteredWith.university_location = models.Section.university_location).all()
+    # assignments = db.session.query(models.AssignedTo)\
+    #     .filter(student_sections.section_number = models.AssignedTo.section_number and
+    #         student_sections.course_code = models.AssignedTo.course_code and 
+    #         student_sections.course_semester = models.AssignedTo.course_semester and
+    #         student_sections.university_name = models.AssignedTo.university_name and
+    #         student_sections.university_location = models.AssignedTo.university_location)
+    form = forms.GroupNewFormFactory.form(student_sections)
+    if form.validate_on_submit():
+        try:
+            form.errors.pop('database', None)
+            models.SchoolGroup.addNew(form.name.data, form.course.data, currentuser)
+            # if form.assignment:
+            #     models.ProjectGroup.addNew(form.name, form.course, form.assignment)
+            # else:
+            return redirect('/')
+        except BaseException as e:
+            form.errors['database'] = str(e)
+            return render_template('new-drinker.html', form=forms.UserLoginFormFactory.form())
+    else:
+        return render_template('new-drinker.html', form=forms.UserLoginFormFactory.form())
+
 @app.route('/drinker/<name>')
 def drinker(name):
     drinker = db.session.query(models.Drinker)\

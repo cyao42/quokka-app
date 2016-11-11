@@ -45,12 +45,28 @@ class SchoolGroup(db.Model):
     __tablename__ = 'schoolgroup'
     g_id = db.Column('g_id', db.Integer(), primary_key=True)
     group_name = db.Column('group_name', db.String(256))
+    @staticmethod
+    def addNew(group_name, course, currentuser):
+        try:
+            g_id = db.session.query(SchoolGroup).count()+1
+            db.session.execute('INSERT INTO groups VALUES(:g_id, :group_name)',
+                               dict(g_id=g_id, group_name=group_name))
+            db.session.execute('INSERT INTO studygroup VALUES(:g_id, :name)',
+                               dict(g_id=g_id, name=group_name))
+            db.session.execute('INSERT INTO studyingfor VALUES(:g_id, :course_code, :course_semester, :university_name, :university_location)',
+                dict(g_id=g_id, course_code=course.course_code, course_semester=course.course_semester, university_name=course.university_name, university_location=course.university_location))
+            db.session.execute('INSERT INTO memberof VALUES(:u_id, :g_id, :is_leader)',
+                dict(u_id=currentuser.u_id, g_id=g_id, is_leader='y'))
+            db.session.commit()
+        except Exception as e:
+            db.session.rollback()
+            raise e
 
 class MemberOf(db.Model):
     __tablename__ = 'memberof'
     u_id = db.Column('u_id', db.Integer(), db.ForeignKey('schooluser.u_id'), primary_key=True)
     g_id = db.Column('g_id', db.Integer(), db.ForeignKey('schoolgroup.g_id'), primary_key=True)
-    is_leader = db.Column('is_leader', db.Boolean())
+    is_leader = db.Column('is_leader', db.String(3))
 
 class University(db.Model):
     __tablename__ = 'university'
