@@ -56,7 +56,7 @@ def new_group():
             form.errors['database'] = str(e)
             return render_template('register.html', form=forms.UserLoginFormFactory.form())
     else:
-        return render_template('new-user.html', form=forms.UserLoginFormFactory.form())
+        return render_template('register.html', form=forms.UserLoginFormFactory.form())
 
 @app.route('/user/<id>')
 def user(name):
