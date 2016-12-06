@@ -16,11 +16,11 @@ def login_user():
     user = currentuser
     if form.validate_on_submit():
         try:
-            user = db.session.query(models.SchoolUser)\
-                          .filter(models.SchoolUser.email == form.email.data).first()
+            user = db.session.query(models.Users)\
+                          .filter(models.Users.email == form.email.data).first()
             currentuser = user
             form.errors.pop('database', None)
-            return redirect('/')
+            return redirect('/profile')
         except BaseException as e:
             form.errors['database'] = str(e)
             return render_template('login.html', form=form, user=currentuser)
@@ -58,11 +58,12 @@ def new_group():
     else:
         return render_template('register.html', form=forms.UserLoginFormFactory.form())
 
-@app.route('/user/<id>')
-def user(name):
-    user = db.session.query(models.Users)\
-       .filter(models.Users.id == id).one()
-    return render_template('user.html', user=user)
+@app.route('/profile')
+def user():
+    if(currentuser):
+        return render_template('user.html', user=currentuser)
+    else:
+        return redirect('/')
 
 @app.route('/register/', methods=['GET', 'POST'])
 def register():
@@ -71,7 +72,7 @@ def register():
     if form.validate_on_submit():
         try:
             form.errors.pop('database', None)
-            models.SchoolUser.addNew(form.name.data, form.phone.data,
+            models.Users.addNew(form.name.data, form.phone.data,
                                 form.email.data, form.user_type.data)
             return redirect('/')
         except BaseException as e:
