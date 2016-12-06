@@ -48,7 +48,7 @@ class Groups(db.Model):
     @staticmethod
     def addNew(group_name, course, currentuser):
         try:
-            g_id = db.session.query(SchoolGroup).count()+1
+            g_id = db.session.query(Groups).count()+1
             db.session.execute('INSERT INTO groups VALUES(:g_id, :group_name)',
                                dict(g_id=g_id, group_name=group_name))
             db.session.execute('INSERT INTO studygroup VALUES(:g_id, :name)',
