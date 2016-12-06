@@ -23,9 +23,9 @@ def login_user():
             return redirect('/')
         except BaseException as e:
             form.errors['database'] = str(e)
-            return render_template('all-drinkers.html', form=form, user=currentuser)
+            return render_template('login.html', form=form, user=currentuser)
     else:
-        return render_template('all-drinkers.html', form=form, user=currentuser)
+        return render_template('login.html', form=form, user=currentuser)
 
 @app.route('/new-group', methods=['GET', 'POST'])
 def new_group():
@@ -54,55 +54,20 @@ def new_group():
             return redirect('/')
         except BaseException as e:
             form.errors['database'] = str(e)
-            return render_template('new-drinker.html', form=forms.UserLoginFormFactory.form())
+            return render_template('register.html', form=forms.UserLoginFormFactory.form())
     else:
-        return render_template('new-drinker.html', form=forms.UserLoginFormFactory.form())
+        return render_template('register.html', form=forms.UserLoginFormFactory.form())
 
-@app.route('/drinker/<name>')
-def drinker(name):
-    drinker = db.session.query(models.Drinker)\
-        .filter(models.Drinker.name == name).one()
-    return render_template('drinker.html', drinker=drinker)
+@app.route('/user/<id>')
+def user(name):
+    user = db.session.query(models.User)\
+       .filter(models.User.id == id).one()
+    return render_template('user.html', user=user)
 
-@app.route('/edit-drinker/<name>', methods=['GET', 'POST'])
-def edit_drinker(name):
-    drinker = db.session.query(models.Drinker)\
-        .filter(models.Drinker.name == name).one()
-    beers = db.session.query(models.Beer).all()
-    bars = db.session.query(models.Bar).all()
-    form = forms.DrinkerEditFormFactory.form(drinker, beers, bars)
-    if form.validate_on_submit():
-        try:
-            form.errors.pop('database', None)
-            models.Drinker.edit(name, form.name.data, form.address.data,
-                                form.get_beers_liked(), form.get_bars_frequented())
-            return redirect(url_for('drinker', name=form.name.data))
-        except BaseException as e:
-            form.errors['database'] = str(e)
-            return render_template('edit-drinker.html', drinker=drinker, form=form)
-    else:
-        return render_template('edit-drinker.html', drinker=drinker, form=form)
-
-@app.route('/new-drinker/', methods=['GET', 'POST'])
-def new_drinker():
-    beers = db.session.query(models.Beer).all()
-    bars = db.session.query(models.Bar).all()
-    form = forms.DrinkerNewFormFactory.form(beers, bars)
-    if form.validate_on_submit():
-        try:
-            form.errors.pop('database', None)
-            models.Drinker.addNew(form.name.data, form.address.data,
-                                form.get_beers_liked(), form.get_bars_frequented())
-            return redirect(url_for('drinker', name=form.name.data))
-        except BaseException as e:
-            form.errors['database'] = str(e)
-            return render_template('new-drinker.html', form=form)
-    else:
-        return render_template('new-drinker.html', form=form)
-
-@app.route('/new-user/', methods=['GET', 'POST'])
-def new_user():
-    form = forms.UserNewFormFactory.form()
+@app.route('/register/', methods=['GET', 'POST'])
+def register():
+    print("hit register")
+    form = forms.UserRegisterFormFactory.form()
     if form.validate_on_submit():
         try:
             form.errors.pop('database', None)
@@ -111,9 +76,9 @@ def new_user():
             return redirect('/')
         except BaseException as e:
             form.errors['database'] = str(e)
-            return render_template('new-user.html', form=form)
+            return render_template('register.html', form=form)
     else:
-        return render_template('new-user.html', form=form)
+        return render_template('register.html', form=form)
 
 @app.template_filter('pluralize')
 def pluralize(number, singular='', plural='s'):
