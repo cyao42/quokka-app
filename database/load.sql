@@ -1,6 +1,6 @@
-\COPY Users(u_id, name, phone, email) FROM 'data/Users.dat' WITH DELIMITER ',' NULL '' CSV
-\COPY Professor(u_id, name, phone, email) FROM 'data/Professor.dat' WITH DELIMITER ',' NULL '' CSV
-\COPY Student(u_id, name, phone, email, first_major, second_major, grad_year) FROM 'data/Student.dat' WITH DELIMITER ',' NULL '' CSV
+\COPY Users(u_id, name, phone, email, password) FROM 'data/Users.dat' WITH DELIMITER ',' NULL '' CSV
+\COPY Professor(u_id, name, phone, email, password) FROM 'data/Professor.dat' WITH DELIMITER ',' NULL '' CSV
+\COPY Student(u_id, name, phone, email, password, first_major, second_major, grad_year) FROM 'data/Student.dat' WITH DELIMITER ',' NULL '' CSV
 \COPY Groups(group_name, g_id) FROM 'data/Groups.dat' WITH DELIMITER ',' NULL '' CSV
 \COPY MemberOf(u_id, g_id, is_leader) FROM 'data/MemberOf.dat' WITH DELIMITER ',' NULL '' CSV
 \COPY University(university_name, university_location) FROM 'data/University.dat' WITH DELIMITER ',' NULL '' CSV
