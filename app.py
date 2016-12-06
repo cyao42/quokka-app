@@ -16,8 +16,8 @@ def login_user():
     user = currentuser
     if form.validate_on_submit():
         try:
-            user = db.session.query(models.SchoolUser)\
-                          .filter(models.SchoolUser.email == form.email.data).first()
+            user = db.session.query(models.Users)\
+                          .filter(models.Users.email == form.email.data).first()
             currentuser = user
             form.errors.pop('database', None)
             return redirect('/')
@@ -106,7 +106,7 @@ def new_user():
     if form.validate_on_submit():
         try:
             form.errors.pop('database', None)
-            models.SchoolUser.addNew(form.name.data, form.phone.data,
+            models.Users.addNew(form.name.data, form.phone.data,
                                 form.email.data, form.user_type.data)
             return redirect('/')
         except BaseException as e:
