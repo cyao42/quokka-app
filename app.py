@@ -16,8 +16,8 @@ def login_user():
     user = currentuser
     if form.validate_on_submit():
         try:
-            user = db.session.query(models.SchoolUser)\
-                          .filter(models.SchoolUser.email == form.email.data).first()
+            user = db.session.query(models.Users)\
+                          .filter(models.Users.email == form.email.data).first()
             currentuser = user
             form.errors.pop('database', None)
             return redirect('/')
@@ -49,7 +49,7 @@ def new_group():
             form.errors.pop('database', None)
             models.SchoolGroup.addNew(form.name.data, form.course.data, currentuser)
             # if form.assignment:
-            #     models.ProjectGroup.addNew(form.name, form.course, form.assignment)
+            #     models.ProjectGroup.addNew(form.name, form.Class, form.assignment)
             # else:
             return redirect('/')
         except BaseException as e:
@@ -71,7 +71,7 @@ def register():
     if form.validate_on_submit():
         try:
             form.errors.pop('database', None)
-            models.SchoolUser.addNew(form.name.data, form.phone.data,
+            models.Users.addNew(form.name.data, form.phone.data,
                                 form.email.data, form.user_type.data)
             return redirect('/')
         except BaseException as e:
@@ -79,6 +79,12 @@ def register():
             return render_template('register.html', form=form)
     else:
         return render_template('register.html', form=form)
+
+@app.route('/classfeed/<id>')
+def classfeed():
+    classfeed = db.session.query(models.Course)\
+       .filter(models.Course.id == id).one()
+    return render_template('classfeed.html', classfeed=classfeed)
 
 @app.template_filter('pluralize')
 def pluralize(number, singular='', plural='s'):
