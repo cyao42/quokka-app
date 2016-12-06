@@ -59,9 +59,9 @@ def new_group():
         return render_template('register.html', form=forms.UserLoginFormFactory.form())
 
 @app.route('/user/<id>')
-def user(name):
-    user = db.session.query(models.User)\
-       .filter(models.User.id == id).one()
+def user(id):
+        user = db.session.query(models.Users)\
+       .filter(models.Users.id == id).one()
     return render_template('user.html', user=user)
 
 @app.route('/register/', methods=['GET', 'POST'])
