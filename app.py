@@ -60,8 +60,8 @@ def new_group():
 
 @app.route('/user/<id>')
 def user(name):
-    user = db.session.query(models.User)\
-       .filter(models.User.id == id).one()
+    user = db.session.query(models.Users)\
+       .filter(models.Users.id == id).one()
     return render_template('user.html', user=user)
 
 @app.route('/register/', methods=['GET', 'POST'])
