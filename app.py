@@ -20,7 +20,7 @@ def login_user():
                           .filter(models.Users.email == form.email.data).first()
             currentuser = user
             form.errors.pop('database', None)
-            return redirect('/')
+            return redirect('/profile')
         except BaseException as e:
             form.errors['database'] = str(e)
             return render_template('login.html', form=form, user=currentuser)
@@ -58,11 +58,12 @@ def new_group():
     else:
         return render_template('register.html', form=forms.UserLoginFormFactory.form())
 
-@app.route('/user/<id>')
-def user(id):
-        user = db.session.query(models.Users)\
-       .filter(models.Users.id == id).one()
-    return render_template('user.html', user=user)
+@app.route('/profile')
+def user():
+    if(currentuser):
+        return render_template('user.html', user=currentuser)
+    else:
+        return redirect('/')
 
 @app.route('/register/', methods=['GET', 'POST'])
 def register():
