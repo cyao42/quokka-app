@@ -61,6 +61,11 @@ def new_group():
 @app.route('/profile')
 def user():
     if(currentuser):
+        classes = db.session.query(models.RegisteredWith)\
+            .filter(models.RegisteredWith.u_id == currentuser.u_id)
+        print "the theing begore the thing of interest"
+        for theClass in classes:
+             print theClass.
         return render_template('user.html', user=currentuser)
     else:
         return redirect('/')
