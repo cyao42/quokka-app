@@ -18,9 +18,15 @@ def login_user():
         try:
             user = db.session.query(models.Users)\
                           .filter(models.Users.email == form.email.data).first()
-            currentuser = user
-            form.errors.pop('database', None)
-            return redirect('/profile')
+            if user:
+                if user.password == form.password.data:
+                    currentuser = user
+                    form.errors.pop('database', None)
+                    return redirect('/profile')
+                else:
+                    return render_template('login.html', form=form, user=None, msg="Incorrect password!")
+            else:
+                return render_template('login.html', form=form, user=None, msg="No user with that email")
         except BaseException as e:
             form.errors['database'] = str(e)
             return render_template('login.html', form=form, user=currentuser)
