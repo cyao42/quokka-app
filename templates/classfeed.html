@@ -1,11 +1,5 @@
 {% extends 'layout.html' %}
-{% block heading %}Posts for {% endblock %}
+{% block heading %}Posts for:{% endblock %}
 {% block content %}
-<form action="{{url_for('register')}}" method="POST">
-  {{form.csrf_token}}
-  <p>
-    Name: {{form.name}}
-    {% if form.name.errors %}
-    <ul>{% for error in form.name.errors %}<li>{{error}}</li>{% endfor %}</ul>
-    {% endif %}
-  </p>
+<p>Post 1</p>
+{% endblock %}

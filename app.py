@@ -49,7 +49,7 @@ def new_group():
             form.errors.pop('database', None)
             models.SchoolGroup.addNew(form.name.data, form.course.data, currentuser)
             # if form.assignment:
-            #     models.ProjectGroup.addNew(form.name, form.Class, form.assignment)
+            #     models.ProjectGroup.addNew(form.name, form.course, form.assignment)
             # else:
             return redirect('/')
         except BaseException as e:
@@ -81,10 +81,8 @@ def register():
     else:
         return render_template('register.html', form=form)
 
-@app.route('/classfeed/<id>')
+@app.route('/classfeed/')
 def classfeed():
-    classfeed = db.session.query(models.Course)\
-       .filter(models.Course.id == id).one()
     return render_template('classfeed.html', classfeed=classfeed)
 
 @app.template_filter('pluralize')
