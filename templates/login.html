@@ -31,4 +31,7 @@
 You are logged in as {{user.email}}<br>
 <a href="{{url_for('new_group')}}">Create Group</a>
 {% endif %}
+{% if msg %}
+<p>{{msg}}</p>
+{% endif %}
 {% endblock %}
