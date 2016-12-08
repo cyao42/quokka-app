@@ -4,8 +4,10 @@
 <p>Name: {{user.name}}</p>
 <h2>My Groups:</h2>
 {% if groups|length > 0 %}
-<ul>{% for group in groups %}<li>{{group.group_name}}</li>{% endfor %}</ul>
-{% else % }
+<ul>
+{% for group in groups %}<li>{{group.group_name}}</li>{% endfor %}
+</ul>
+{% else %}
 <p>You are not in any groups!</p>
-{% endif % }
+{% endif %}
 {% endblock %}

@@ -64,7 +64,7 @@ def user():
         groups = db.session.query(models.Groups).\
                  join(models.MemberOf).\
                  filter(models.MemberOf.u_id == currentuser.u_id).all()
-        return render_template('user.html', user=currentuser)
+        return render_template('user.html', user=currentuser, groups=groups)
     else:
         return redirect('/')
 
