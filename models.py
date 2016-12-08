@@ -93,7 +93,7 @@ class Section(db.Model):
 
 class RegisteredWith(db.Model):
     __tablename__ = 'registeredwith'
-    u_id = db.Column('u_id', db.Integer(), db.ForeignKey('Users.u_id'), primary_key=True)    
+    u_id = db.Column('u_id', db.Integer(), db.ForeignKey('users.u_id'), primary_key=True)
     section_number = db.Column('section_number', db.Integer(), db.ForeignKey('section.section_number'), primary_key=True)
     course_code = db.Column('course_code', db.String(256), db.ForeignKey('course.course_code'), primary_key=True)
     course_semester = db.Column('course_semester', db.String(256), db.ForeignKey('course.course_semester'), primary_key=True)

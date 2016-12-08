@@ -43,35 +43,35 @@ CREATE TABLE University
  PRIMARY KEY (university_name, university_location)
 );
 
-CREATE TABLE Class
-(class_code VARCHAR(256) NOT NULL,
- class_semester VARCHAR(256) NOT NULL,
+CREATE TABLE Course
+(course_code VARCHAR(256) NOT NULL,
+ course_semester VARCHAR(256) NOT NULL,
  university_name VARCHAR(256) NOT NULL,
  university_location VARCHAR(256) NOT NULL,
- PRIMARY KEY (class_code,class_semester,university_name,university_location),
+ PRIMARY KEY (course_code,course_semester,university_name,university_location),
 FOREIGN KEY (university_name, university_location) REFERENCES University (university_name, university_location)
 );
 
 CREATE TABLE Section
 (section_number INTEGER NOT NULL,
- class_code     VARCHAR(256) NOT NULL,
- class_semester VARCHAR(256) NOT NULL,
+ course_code     VARCHAR(256) NOT NULL,
+ course_semester VARCHAR(256) NOT NULL,
  university_name VARCHAR(256) NOT NULL,
  university_location VARCHAR(256) NOT NULL,
- PRIMARY KEY (section_number,class_code,class_semester,university_name,university_location),
-FOREIGN KEY (class_code, class_semester, university_name, university_location) REFERENCES Class (class_code, class_semester, university_name, university_location)
+ PRIMARY KEY (section_number,course_code,course_semester,university_name,university_location),
+FOREIGN KEY (course_code, course_semester, university_name, university_location) REFERENCES Course (course_code, course_semester, university_name, university_location)
 );
 
 CREATE TABLE RegisteredWith
 (u_id INTEGER NOT NULL UNIQUE REFERENCES Users(u_id),
  section_number INTEGER NOT NULL,
- class_code VARCHAR(256) NOT NULL,
- class_semester VARCHAR(265) NOT NULL,
+ course_code VARCHAR(256) NOT NULL,
+ course_semester VARCHAR(265) NOT NULL,
  university_name VARCHAR(265) NOT NULL,
  university_location VARCHAR(265) NOT NULL,
- PRIMARY KEY (u_id,section_number,class_code,class_semester,university_name,university_location),
-FOREIGN KEY (section_number, class_code, class_semester, university_name, university_location)
-REFERENCES Section (section_number, class_code, class_semester, university_name, university_location)
+ PRIMARY KEY (u_id,section_number,course_code,course_semester,university_name,university_location),
+FOREIGN KEY (section_number, course_code, course_semester, university_name, university_location)
+REFERENCES Section (section_number, course_code, course_semester, university_name, university_location)
 );
 
 CREATE TABLE Add 
@@ -94,13 +94,13 @@ CREATE TABLE ProjectAssignment
 CREATE TABLE AssignedTo 
 (assignment_id INTEGER NOT NULL REFERENCES ProjectAssignment(assignment_id),
  section_number INTEGER NOT NULL,
- class_code VARCHAR(256) NOT NULL,
- class_semester VARCHAR(256) NOT NULL,
+ course_code VARCHAR(256) NOT NULL,
+ course_semester VARCHAR(256) NOT NULL,
  university_name VARCHAR(256) NOT NULL,
  university_location VARCHAR(256) NOT NULL,
- PRIMARY KEY (assignment_id,section_number,class_code,class_semester,university_name,university_location),
-FOREIGN KEY (section_number, class_code, class_semester, university_name, university_location)
-REFERENCES Section (section_number, class_code, class_semester, university_name, university_location)
+ PRIMARY KEY (assignment_id,section_number,course_code,course_semester,university_name,university_location),
+FOREIGN KEY (section_number, course_code, course_semester, university_name, university_location)
+REFERENCES Section (section_number, course_code, course_semester, university_name, university_location)
 );
 
 CREATE TABLE Post
@@ -141,13 +141,13 @@ CREATE TABLE WorkingOn
 CREATE TABLE StudyingFor 
 (g_id INTEGER NOT NULL REFERENCES Groups(g_id),
  section_number INTEGER,
- class_code VARCHAR(256) NOT NULL,
- class_semester VARCHAR(256) NOT NULL,
+ course_code VARCHAR(256) NOT NULL,
+ course_semester VARCHAR(256) NOT NULL,
  university_name VARCHAR(256) NOT NULL,
  university_location VARCHAR(256) NOT NULL,
- PRIMARY KEY (g_id,section_number,class_code,class_semester,university_name,university_location),
- FOREIGN KEY (section_number,class_code, class_semester, university_name, university_location)
- REFERENCES Section(section_number,class_code, class_semester, university_name, university_location)
+ PRIMARY KEY (g_id,section_number,course_code,course_semester,university_name,university_location),
+ FOREIGN KEY (section_number,course_code,course_semester,university_name,university_location)
+ REFERENCES Section(section_number,course_code, course_semester, university_name, university_location)
 );
 
 --List the names and groups of all leaders.--
@@ -165,4 +165,4 @@ SELECT Users.name FROM Users EXCEPT (SELECT Users.name FROM Users NATURAL JOIN M
 
 --List the project descriptions of projects that have been assigned for CS316.
 
-SELECT ProjectAssignment.description FROM ProjectAssignment NATURAL JOIN AssignedTo WHERE AssignedTo.class_code = '431';
+SELECT ProjectAssignment.description FROM ProjectAssignment NATURAL JOIN AssignedTo WHERE AssignedTo.course_code = '431';
