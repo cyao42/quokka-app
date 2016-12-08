@@ -1,0 +1,9 @@
+{% extends 'layout.html' %}
+{% block heading %}Posts for: {{assignment.description}} {% endblock %}
+{% block content %}
+
+{% for post in posts % } 
+   <p>{{post.message}}</p>
+{% endblock %}
+
+{% endblock %}

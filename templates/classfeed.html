@@ -1,5 +1,14 @@
 {% extends 'layout.html' %}
-{% block heading %}Posts for:{% endblock %}
+{% block heading %}Posts for: {{course.course_code}} {% endblock %}
 {% block content %}
+<form name="assignments" action="{{ url_for('getPosts(assignment)') }}" method="POST">
+   <select name="select_assignment">
+   {% for assignment in course.assignments % }
+   <option value ="{{ assignment }}">{{assignment.description}}</option>
+   {% endfor %}
+   </select>
+   <button type="submit">Get Feed</button>
+</form>> 
+      
 <p>Post 1</p>
 {% endblock %}
