@@ -7,18 +7,19 @@ class Users(db.Model):
     name = db.Column('name', db.String(256))
     phone = db.Column('phone', db.String(15))
     email = db.Column('email', db.String(256))
+    password = db.Column('password', db.String(256))
     @staticmethod
-    def addNew(name, phone, email, user_type):
+    def addNew(name, phone, email, user_type, password):
         try:
             u_id = db.session.query(Users).count()+1
-            db.session.execute('INSERT INTO Users VALUES(:u_id, :name, :phone, :email)',
-                               dict(u_id=u_id, name=name, phone=phone, email=email))
+            db.session.execute('INSERT INTO Users VALUES(:u_id, :name, :phone, :email, :password)',
+                               dict(u_id=u_id, name=name, phone=phone, email=email, password=password))
             if user_type == 'pro':
-                db.session.execute('INSERT INTO professor VALUES(:u_id, :name, :phone, :email)',
-                    dict(u_id=u_id, name=name, phone=phone, email=email))  
+                db.session.execute('INSERT INTO professor VALUES(:u_id, :name, :phone, :email, :password)',
+                    dict(u_id=u_id, name=name, phone=phone, email=email, password=password))
             else:
-                db.session.execute('INSERT INTO student VALUES(:u_id, :name, :phone, :email)',
-                    dict(u_id=u_id, name=name, phone=phone, email=email))
+                db.session.execute('INSERT INTO student VALUES(:u_id, :name, :phone, :email, :password)',
+                    dict(u_id=u_id, name=name, phone=phone, email=email, password=password))
             db.session.commit()
         except Exception as e:
             db.session.rollback()
@@ -29,14 +30,16 @@ class Professor(db.Model):
     u_id = db.Column('u_id', db.Integer(), db.ForeignKey('Users.u_id'), primary_key=True)
     name = db.Column('name', db.String(256))
     phone = db.Column('phone', db.Integer())
-    email = db.Column('email', db.String(256))   
+    email = db.Column('email', db.String(256))
+    password = db.Column('password', db.String(256))
 
 class Student(db.Model):
     __tablename__ = 'student'
     u_id = db.Column('u_id', db.Integer(), db.ForeignKey('Users.u_id'), primary_key=True)
     name = db.Column('name', db.String(256))
     phone = db.Column('phone', db.Integer())
-    email = db.Column('email', db.String(256))  
+    email = db.Column('email', db.String(256))
+    password = db.Column('password', db.String(256))
     first_major = db.Column('first_major', db.String(256))
     second_major = db.Column('second_major', db.String(256))
     grad_year = db.Column('grad_year', db.Integer())  
