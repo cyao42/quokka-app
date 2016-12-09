@@ -20,7 +20,7 @@ def login_user():
                           .filter(models.Users.email == form.email.data).first()
             currentuser = user
             form.errors.pop('database', None)
-            return redirect('/')
+            return redirect('/profile')
         except BaseException as e:
             form.errors['database'] = str(e)
             return render_template('login.html', form=form, user=currentuser)
@@ -49,7 +49,7 @@ def new_group():
             form.errors.pop('database', None)
             models.SchoolGroup.addNew(form.name.data, form.course.data, currentuser)
             # if form.assignment:
-            #     models.ProjectGroup.addNew(form.name, form.Class, form.assignment)
+            #     models.ProjectGroup.addNew(form.name, form.course, form.assignment)
             # else:
             return redirect('/')
         except BaseException as e:
@@ -58,11 +58,12 @@ def new_group():
     else:
         return render_template('register.html', form=forms.UserLoginFormFactory.form())
 
-@app.route('/user/<id>')
-def user(name):
-    user = db.session.query(models.Users)\
-       .filter(models.Users.id == id).one()
-    return render_template('user.html', user=user)
+@app.route('/profile')
+def user():
+    if(currentuser):
+        return render_template('user.html', user=currentuser)
+    else:
+        return redirect('/')
 
 @app.route('/register/', methods=['GET', 'POST'])
 def register():
@@ -81,10 +82,16 @@ def register():
         return render_template('register.html', form=form)
 
 @app.route('/classfeed/<id>')
-def classfeed():
-    classfeed = db.session.query(models.Course)\
-       .filter(models.Course.id == id).one()
-    return render_template('classfeed.html', classfeed=classfeed)
+def classfeed(id):
+    course = db.session.query(models.Course)\
+       .filter(models.Class.id == id).one()
+    #assignments = models.Course.getAssignments(course.course_code)
+    
+    return render_template('classfeed.html', course=course)
+
+def getPosts(assignment): 
+    posts = assignment.posts
+    return render_template('classfeed-posts.html', posts=posts, assignment=assignment)
 
 @app.template_filter('pluralize')
 def pluralize(number, singular='', plural='s'):

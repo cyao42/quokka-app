@@ -1,4 +1,5 @@
 from sqlalchemy import sql, orm
+from sqlalchemy.sql import text 
 from app import db
 
 class Users(db.Model):
@@ -48,7 +49,7 @@ class Groups(db.Model):
     @staticmethod
     def addNew(group_name, course, currentuser):
         try:
-            g_id = db.session.query(SchoolGroup).count()+1
+            g_id = db.session.query(Groups).count()+1
             db.session.execute('INSERT INTO groups VALUES(:g_id, :group_name)',
                                dict(g_id=g_id, group_name=group_name))
             db.session.execute('INSERT INTO studygroup VALUES(:g_id, :name)',
@@ -79,6 +80,23 @@ class Course(db.Model):
     course_semester = db.Column('course_semester', db.String(10), primary_key=True)
     university_name = db.Column('university_name', db.String(256), db.ForeignKey('university.university_name'), primary_key=True)
     university_location = db.Column('university_location', db.String(256), db.ForeignKey('university.university_location'), primary_key=True)
+    assignments_to = orm.relationship('AssignedTo')
+    assignments = []
+    for entry in assignments_to: 
+	assignment = entry.assignments[] 
+        assignments.append(assignment)
+    # @staticmethod
+     
+   # def getAssignments(course_code):
+      # try:
+        # result = db.session.execute('SELECT ProjectAssignment.assignment_id NATURAL JOIN AssignedTo WHERE AssignedTo.class_code = course_code')
+        # for r in result:
+        
+        # db.session.commit()
+       #except Exception as e:
+        # db.session.rollback()
+         #raise e
+        
 
 class Section(db.Model):
     __tablename__ = 'section'
@@ -123,7 +141,7 @@ class ProjectAssignment(db.Model):
     date_assigned = db.Column('date_assigned', db.String(20))
     date_due = db.Column('date_due', db.String(20))
     description = db.Column('description', db.String(1000))
-
+    posts = orm.relationship('Post')
 class AssignedTo(db.Model):
     __tablename__ = 'assignedto'
     assignment_id = db.Column('assignment_id', db.String(256), db.ForeignKey('projectassignment.assignment_id'), primary_key=True)
@@ -132,6 +150,7 @@ class AssignedTo(db.Model):
     course_semester = db.Column('course_semester', db.String(256), db.ForeignKey('course.course_semester'), primary_key=True)
     university_name = db.Column('university_name', db.String(256), db.ForeignKey('university.university_name'), primary_key=True)
     university_location = db.Column('university_location', db.String(256), db.ForeignKey('university.university_location'), primary_key=True)
+    assignments = orm.relationship('ProjectAssignment')     
 
 class Post(db.Model):
     __tablename__ = 'post'
