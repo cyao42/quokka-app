@@ -86,6 +86,18 @@ def register():
     else:
         return render_template('register.html', form=form)
 
+@app.route('/classfeed/<id>')
+def classfeed(id):
+    course = db.session.query(models.Course)\
+       .filter(models.Class.id == id).one()
+    #assignments = models.Course.getAssignments(course.course_code)
+    
+    return render_template('classfeed.html', course=course)
+
+def getPosts(assignment): 
+    posts = assignment.posts
+    return render_template('classfeed-posts.html', posts=posts, assignment=assignment)
+
 @app.template_filter('pluralize')
 def pluralize(number, singular='', plural='s'):
     return singular if number in (0, 1) else plural
