@@ -1,6 +1,6 @@
 body {
     color: DarkSlateBlue;
-    background: LightSteelBlue;
+    background: Lavender;
     font-family: 'Cooper Black', serif;
     text-align: center;
 
@@ -25,4 +25,8 @@ title{
 img{
     border-radius:50%;
     border:3px solid black;
+}
+
+h1 {
+    font-size:60px;
 }

@@ -17,12 +17,17 @@ h1 {
         border:3px outset WhiteSmoke;
 }
 
-#groups {
-        background-color: WhiteSmoke;
-        position: relative;
-        padding: 10px 10px 10px 10px;
-        border-radius: 10px 10px 10px 10px;
-        border:3px outset black;
+.group:before,
+.group:after {
+  content: "";
+  display: table;
+}
+.group:after {
+  clear: both;
+}
+.group {
+  clear: both;
+  *   : 1;
 }
 
 img { border-radius:50%;
@@ -39,14 +44,20 @@ h2 {
 text-align:center;
 }
 
-#members {
+section{
+        background-color: WhiteSmoke;
+        float:left;
+        margin:0 1.5%;
+        width:63%;
+        border-radius:10px 10px 10px 10px;
+        border:1px outset WhiteSmoke;
+}
+
+aside {
         background-color: LightCoral;
-        display:inline-block;
-        border-radius:50%;
-        color: Black;
-        font-family: Cooper Black;
-        padding: 1px 5px 1px 5px;
-        border: 2px outset LightCoral;
-        margin:auto;
-        margin-left:565px;
+        float:right;
+        margin:0 1.5%;
+        width:30%;
+        border-radius:10px 10px 10px 10px;
+        border:1px outset LightCoral;
 }
