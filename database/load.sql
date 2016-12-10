@@ -4,7 +4,7 @@
 \COPY Groups(group_name, g_id) FROM 'data/Groups.dat' WITH DELIMITER ',' NULL '' CSV
 \COPY MemberOf(u_id, g_id, is_leader) FROM 'data/MemberOf.dat' WITH DELIMITER ',' NULL '' CSV
 \COPY University(university_name, university_location) FROM 'data/University.dat' WITH DELIMITER ',' NULL '' CSV
-\COPY Course(course_code, course_semester, university_name, university_location) FROM 'data/Class.dat' WITH DELIMITER ',' NULL '' CSV
+\COPY Course(course_code, course_semester, university_name, university_location, course_name, course_pre) FROM 'data/Class.dat' WITH DELIMITER ',' NULL '' CSV
 \COPY Section(section_number, course_code, course_semester, university_name, university_location) FROM 'data/Section.dat' WITH DELIMITER ',' NULL '' CSV
 \COPY RegisteredWith(u_id, section_number, course_code, course_semester, university_name, university_location) FROM 'data/RegisteredWith.dat' WITH DELIMITER ',' NULL '' CSV
 \COPY Add(j_id, g_id, message, approved, sent_by, sent_to) FROM 'data/Add.dat' WITH DELIMITER ',' NULL '' CSV

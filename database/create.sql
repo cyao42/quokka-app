@@ -48,6 +48,8 @@ CREATE TABLE Course
  course_semester VARCHAR(256) NOT NULL,
  university_name VARCHAR(256) NOT NULL,
  university_location VARCHAR(256) NOT NULL,
+ course_name VARCHAR(256) NOT NULL,
+ course_pre VARCHAR(256) NOT NULL,
  PRIMARY KEY (course_code,course_semester,university_name,university_location),
 FOREIGN KEY (university_name, university_location) REFERENCES University (university_name, university_location)
 );

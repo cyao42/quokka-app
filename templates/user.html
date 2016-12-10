@@ -13,7 +13,7 @@
 <h2>My Classes:</h2>
 {% if classes|length > 0 %}
 <ul>
-{% for classThing in classes %}<li>{{classThing.course_code}}</li>{% endfor %}
+{% for classThing in classes %}<li>{{classThing.course_semester}} {{classThing.course_code}} {{classThing.course_name}}</li>{% endfor %}
 </ul>
 {% else %}
 <p>You are not in any classes!</p>

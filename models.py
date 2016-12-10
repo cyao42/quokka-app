@@ -83,23 +83,8 @@ class Course(db.Model):
     course_semester = db.Column('course_semester', db.String(10), primary_key=True)
     university_name = db.Column('university_name', db.String(256), db.ForeignKey('university.university_name'), primary_key=True)
     university_location = db.Column('university_location', db.String(256), db.ForeignKey('university.university_location'), primary_key=True)
-    #assignments_to = orm.relationship('AssignedTo')
-    #assignments = []
-    #for entry in assignments_to:
-    #   assignment = entry.assignments[]
-    #   assignments.append(assignment)
-    # @staticmethod
-     
-   # def getAssignments(course_code):
-      # try:
-        # result = db.session.execute('SELECT ProjectAssignment.assignment_id NATURAL JOIN AssignedTo WHERE AssignedTo.class_code = course_code')
-        # for r in result:
-        
-        # db.session.commit()
-       #except Exception as e:
-        # db.session.rollback()
-         #raise e
-        
+    course_name = db.Column('course_name', db.String(256))
+    course_pre = db.Column('course_pre', db.String(256))
 
 class Section(db.Model):
     __tablename__ = 'section'
