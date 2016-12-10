@@ -50,16 +50,22 @@ class Groups(db.Model):
     group_name = db.Column('group_name', db.String(256))
     g_id = db.Column('g_id', db.Integer(), primary_key=True)
     @staticmethod
-    def addNew(group_name, section_id, currentuser):
+    def addNew(group_name, section_id, assignment_id, currentuser):
         try:
             g_id = db.session.query(Groups).count()+1
             section_id = int(section_id)
             db.session.execute('INSERT INTO groups VALUES(:group_name, :g_id)',
                                dict(group_name=group_name, g_id=g_id))
-            db.session.execute('INSERT INTO studygroup VALUES(:g_id, :name)',
+            if assignment_id == "none":
+                db.session.execute('INSERT INTO studygroup VALUES(:g_id, :name)',
                                dict(g_id=g_id, name=group_name))
-            db.session.execute('INSERT INTO studyingfor VALUES(:g_id, :section_id)',
+                db.session.execute('INSERT INTO studyingfor VALUES(:g_id, :section_id)',
                                dict(g_id=g_id, section_id=section_id))
+            else:
+                db.session.execute('INSERT INTO projectgroup VALUES(:g_id, :name)',
+                                   dict(g_id=g_id, name=group_name))
+                db.session.execute('INSERT INTO workingon VALUES(:g_id, :assignment_id)',
+                                   dict(g_id=g_id, assignment_id=int(assignment_id)))
             db.session.execute('INSERT INTO memberof VALUES(:u_id, :g_id, :is_leader)',
                 dict(u_id=currentuser.u_id, g_id=g_id, is_leader='yes'))
             db.session.commit()
