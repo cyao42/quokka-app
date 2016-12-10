@@ -8,18 +8,19 @@ class Users(db.Model):
     name = db.Column('name', db.String(256))
     phone = db.Column('phone', db.String(15))
     email = db.Column('email', db.String(256))
+    password = db.Column('password', db.String(256))
     @staticmethod
-    def addNew(name, phone, email, user_type):
+    def addNew(name, phone, email, user_type, password):
         try:
             u_id = db.session.query(Users).count()+1
-            db.session.execute('INSERT INTO Users VALUES(:u_id, :name, :phone, :email)',
-                               dict(u_id=u_id, name=name, phone=phone, email=email))
+            db.session.execute('INSERT INTO users VALUES(:u_id, :name, :phone, :email, :password)',
+                               dict(u_id=u_id, name=name, phone=phone, email=email, password=password))
             if user_type == 'pro':
-                db.session.execute('INSERT INTO professor VALUES(:u_id, :name, :phone, :email)',
-                    dict(u_id=u_id, name=name, phone=phone, email=email))  
+                db.session.execute('INSERT INTO professor VALUES(:u_id, :name, :phone, :email, :password)',
+                    dict(u_id=u_id, name=name, phone=phone, email=email, password=password))
             else:
-                db.session.execute('INSERT INTO student VALUES(:u_id, :name, :phone, :email)',
-                    dict(u_id=u_id, name=name, phone=phone, email=email))
+                db.session.execute('INSERT INTO student VALUES(:u_id, :name, :phone, :email, :password)',
+                    dict(u_id=u_id, name=name, phone=phone, email=email, password=password))
             db.session.commit()
         except Exception as e:
             db.session.rollback()
@@ -30,14 +31,16 @@ class Professor(db.Model):
     u_id = db.Column('u_id', db.Integer(), db.ForeignKey('Users.u_id'), primary_key=True)
     name = db.Column('name', db.String(256))
     phone = db.Column('phone', db.Integer())
-    email = db.Column('email', db.String(256))   
+    email = db.Column('email', db.String(256))
+    password = db.Column('password', db.String(256))
 
 class Student(db.Model):
     __tablename__ = 'student'
     u_id = db.Column('u_id', db.Integer(), db.ForeignKey('Users.u_id'), primary_key=True)
     name = db.Column('name', db.String(256))
     phone = db.Column('phone', db.Integer())
-    email = db.Column('email', db.String(256))  
+    email = db.Column('email', db.String(256))
+    password = db.Column('password', db.String(256))
     first_major = db.Column('first_major', db.String(256))
     second_major = db.Column('second_major', db.String(256))
     grad_year = db.Column('grad_year', db.Integer())  
@@ -47,15 +50,22 @@ class Groups(db.Model):
     group_name = db.Column('group_name', db.String(256))
     g_id = db.Column('g_id', db.Integer(), primary_key=True)
     @staticmethod
-    def addNew(group_name, course, currentuser):
+    def addNew(group_name, section_id, assignment_id, currentuser):
         try:
             g_id = db.session.query(Groups).count()+1
-            db.session.execute('INSERT INTO groups VALUES(:g_id, :group_name)',
-                               dict(g_id=g_id, group_name=group_name))
-            db.session.execute('INSERT INTO studygroup VALUES(:g_id, :name)',
+            section_id = int(section_id)
+            db.session.execute('INSERT INTO groups VALUES(:group_name, :g_id)',
+                               dict(group_name=group_name, g_id=g_id))
+            if assignment_id == "none":
+                db.session.execute('INSERT INTO studygroup VALUES(:g_id, :name)',
                                dict(g_id=g_id, name=group_name))
-            db.session.execute('INSERT INTO studyingfor VALUES(:g_id, :course_code, :course_semester, :university_name, :university_location)',
-                dict(g_id=g_id, course_code=course.course_code, course_semester=course.course_semester, university_name=course.university_name, university_location=course.university_location))
+                db.session.execute('INSERT INTO studyingfor VALUES(:g_id, :section_id)',
+                               dict(g_id=g_id, section_id=section_id))
+            else:
+                db.session.execute('INSERT INTO projectgroup VALUES(:g_id, :name)',
+                                   dict(g_id=g_id, name=group_name))
+                db.session.execute('INSERT INTO workingon VALUES(:g_id, :assignment_id)',
+                                   dict(g_id=g_id, assignment_id=int(assignment_id)))
             db.session.execute('INSERT INTO memberof VALUES(:u_id, :g_id, :is_leader)',
                 dict(u_id=currentuser.u_id, g_id=g_id, is_leader='yes'))
             db.session.commit()
@@ -80,11 +90,11 @@ class Course(db.Model):
     course_semester = db.Column('course_semester', db.String(10), primary_key=True)
     university_name = db.Column('university_name', db.String(256), db.ForeignKey('university.university_name'), primary_key=True)
     university_location = db.Column('university_location', db.String(256), db.ForeignKey('university.university_location'), primary_key=True)
-    assignments_to = orm.relationship('AssignedTo')
-    assignments = []
-    for entry in assignments_to: 
-	assignment = entry.assignments[] 
-        assignments.append(assignment)
+#    assignments_to = orm.relationship('AssignedTo')
+#    assignments = []
+#    for entry in assignments_to: 
+#	assignment = entry.assignments[] 
+#        assignments.append(assignment)
     # @staticmethod
      
    # def getAssignments(course_code):
@@ -100,20 +110,17 @@ class Course(db.Model):
 
 class Section(db.Model):
     __tablename__ = 'section'
-    section_number = db.Column('section_number', db.Integer(), primary_key=True)
-    course_code = db.Column('course_code', db.String(256), db.ForeignKey('course.course_code'), primary_key=True)
-    course_semester = db.Column('course_semester', db.String(256), db.ForeignKey('course.course_semester'), primary_key=True)
-    university_name = db.Column('university_name', db.String(256), db.ForeignKey('university.university_name'), primary_key=True)
-    university_location = db.Column('university_location', db.String(256), db.ForeignKey('university.university_location'), primary_key=True)
+    section_id = db.Column('section_id', db.Integer(), primary_key=True)
+    section_number = db.Column('section_number', db.Integer())
+    course_code = db.Column('course_code', db.String(256), db.ForeignKey('course.course_code'))
+    course_semester = db.Column('course_semester', db.String(256), db.ForeignKey('course.course_semester'))
+    university_name = db.Column('university_name', db.String(256), db.ForeignKey('university.university_name'))
+    university_location = db.Column('university_location', db.String(256), db.ForeignKey('university.university_location'))
 
 class RegisteredWith(db.Model):
     __tablename__ = 'registeredwith'
-    u_id = db.Column('u_id', db.Integer(), db.ForeignKey('Users.u_id'), primary_key=True)    
-    section_number = db.Column('section_number', db.Integer(), db.ForeignKey('section.section_number'), primary_key=True)
-    course_code = db.Column('course_code', db.String(256), db.ForeignKey('course.course_code'), primary_key=True)
-    course_semester = db.Column('course_semester', db.String(256), db.ForeignKey('course.course_semester'), primary_key=True)
-    university_name = db.Column('university_name', db.String(256), db.ForeignKey('university.university_name'), primary_key=True)
-    university_location = db.Column('university_location', db.String(256), db.ForeignKey('university.university_location'), primary_key=True)
+    u_id = db.Column('u_id', db.Integer(), db.ForeignKey('users.u_id'), primary_key=True)
+    section_id = db.Column('section_id', db.Integer(), db.ForeignKey('section.section_id'), primary_key=True)
 
 class Add(db.Model):
     __tablename__ = 'join'
@@ -142,14 +149,11 @@ class ProjectAssignment(db.Model):
     date_due = db.Column('date_due', db.String(20))
     description = db.Column('description', db.String(1000))
     posts = orm.relationship('Post')
+
 class AssignedTo(db.Model):
     __tablename__ = 'assignedto'
     assignment_id = db.Column('assignment_id', db.String(256), db.ForeignKey('projectassignment.assignment_id'), primary_key=True)
-    section_number = db.Column('section_number', db.Integer(), db.ForeignKey('section.section_number'), primary_key=True)    
-    course_code = db.Column('course_code', db.String(256), db.ForeignKey('course.course_code'), primary_key=True)
-    course_semester = db.Column('course_semester', db.String(256), db.ForeignKey('course.course_semester'), primary_key=True)
-    university_name = db.Column('university_name', db.String(256), db.ForeignKey('university.university_name'), primary_key=True)
-    university_location = db.Column('university_location', db.String(256), db.ForeignKey('university.university_location'), primary_key=True)
+    section_id = db.Column('section_id', db.Integer(), db.ForeignKey('section.section_id'), primary_key=True)
     assignments = orm.relationship('ProjectAssignment')     
 
 class Post(db.Model):
@@ -166,28 +170,24 @@ class NeedTeamPost(db.Model):
 class NeedMemberPost(db.Model):
     __tablename__ = 'needmemberpost'
     assignment_id = db.Column('assignment_id', db.Integer(), db.ForeignKey('projectassignment.assignment_id'), primary_key=True)   
-    g_id = db.Column('g_id', db.Integer(), db.ForeignKey('Groups.g_id'), primary_key=True)
+    g_id = db.Column('g_id', db.Integer(), db.ForeignKey('groups.g_id'), primary_key=True)
 
 class ProjectGroup(db.Model):
     __tablename__ = 'projectgroup'
-    g_id = db.Column('g_id', db.Integer(), db.ForeignKey('Groups.g_id'), primary_key=True)  
+    g_id = db.Column('g_id', db.Integer(), db.ForeignKey('groups.g_id'), primary_key=True)  
     name = db.Column('name', db.String(256))
 
 class StudyGroup(db.Model):
     __tablename__ = 'studygroup'
-    g_id = db.Column('g_id', db.Integer(), db.ForeignKey('Groups.g_id'), primary_key=True)  
+    g_id = db.Column('g_id', db.Integer(), db.ForeignKey('groups.g_id'), primary_key=True)  
     name = db.Column('name', db.String(256))
 
 class WorkingOn(db.Model):
     __tablename__ = 'workingon'
-    g_id = db.Column('g_id', db.Integer(), db.ForeignKey('Groups.g_id'), primary_key=True)
+    g_id = db.Column('g_id', db.Integer(), db.ForeignKey('groups.g_id'), primary_key=True)
     assignment_id = db.Column('assignment_id', db.Integer(), db.ForeignKey('projectassignment.assignment_id'), primary_key=True)         
 
 class StudyingFor(db.Model):
     __tablename__ = 'studyingfor'
-    g_id = db.Column('g_id', db.Integer(), db.ForeignKey('Groups.g_id'), primary_key=True)
-    section_number = db.Column('section_number', db.Integer(), db.ForeignKey('Section.section_number'), primary_key=True)
-    course_code = db.Column('course_code', db.String(256), db.ForeignKey('course.course_code'), primary_key=True)
-    course_semester = db.Column('course_semester', db.String(256), db.ForeignKey('course.course_semester'), primary_key=True) 
-    university_name = db.Column('university_name', db.String(256), db.ForeignKey('course.university_name'), primary_key=True)
-    university_location = db.Column('university_location', db.String(256), db.ForeignKey('course.university_location'), primary_key=True)
+    g_id = db.Column('g_id', db.Integer(), db.ForeignKey('groups.g_id'), primary_key=True)
+    section_id = db.Column('section_id', db.Integer(), db.ForeignKey('section.section_id'), primary_key=True)
