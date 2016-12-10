@@ -65,8 +65,8 @@ def user():
                  join(models.MemberOf).\
                  filter(models.MemberOf.u_id == currentuser.u_id).all()
         classes = db.session.query(models.RegisteredWith)\
-                 .filter(models.RegisteredWith.u_id == currentuser.u_id)
-        return render_template('user.html', user=currentuser, groups=groups)
+                 .filter(models.RegisteredWith.u_id == currentuser.u_id).all()
+        return render_template('user.html', user=currentuser, groups=groups, classes=classes)
     else:
         return redirect('/')
 
