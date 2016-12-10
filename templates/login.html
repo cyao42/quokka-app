@@ -28,8 +28,7 @@
 <hr/>
 <p><a href="{{url_for('register')}}">Register</a></p>
 {% if user %}
-You are logged in as {{user.email}}<br>
-<a href="{{url_for('new_group')}}">Create Group</a>
+You are logged in as <a href="/profile">{{user.email}}</a><br>
 {% endif %}
 {% if msg %}
 <p>{{msg}}</p>

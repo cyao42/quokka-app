@@ -13,7 +13,7 @@ class Users(db.Model):
     def addNew(name, phone, email, user_type, password):
         try:
             u_id = db.session.query(Users).count()+1
-            db.session.execute('INSERT INTO Users VALUES(:u_id, :name, :phone, :email, :password)',
+            db.session.execute('INSERT INTO users VALUES(:u_id, :name, :phone, :email, :password)',
                                dict(u_id=u_id, name=name, phone=phone, email=email, password=password))
             if user_type == 'pro':
                 db.session.execute('INSERT INTO professor VALUES(:u_id, :name, :phone, :email, :password)',
