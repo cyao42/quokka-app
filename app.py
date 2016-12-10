@@ -36,33 +36,19 @@ def login_user():
 @app.route('/new-group', methods=['GET', 'POST'])
 def new_group():
     global currentuser
-    student_sections = db.session.query(models.Section)\
-        .filter(models.RegisteredWith.u_id == currentuser.u_id and
-            models.RegisteredWith.section_number == models.Section.section_number and
-            models.RegisteredWith.course_code == models.Section.course_code and
-            models.RegisteredWith.course_semester == models.Section.course_semester and
-            models.RegisteredWith.university_name == models.Section.university_name and
-            models.RegisteredWith.university_location == models.Section.university_location).all()
-    # assignments = db.session.query(models.AssignedTo)\
-    #     .filter(student_sections.section_number == models.AssignedTo.section_number and
-    #         student_sections.course_code == models.AssignedTo.course_code and 
-    #         student_sections.course_semester == models.AssignedTo.course_semester and
-    #         student_sections.university_name == models.AssignedTo.university_name and
-    #         student_sections.university_location == models.AssignedTo.university_location)
+    student_sections = db.session.query(models.RegisteredWith)\
+                       .filter(models.RegisteredWith.u_id == currentuser.u_id).all()
     form = forms.GroupNewFormFactory.form(student_sections)
     if form.validate_on_submit():
         try:
             form.errors.pop('database', None)
-            models.SchoolGroup.addNew(form.name.data, form.course.data, currentuser)
-            # if form.assignment:
-            #     models.ProjectGroup.addNew(form.name, form.course, form.assignment)
-            # else:
-            return redirect('/')
+            # models.Groups.addNew(form.name.data, form.course.data, currentuser)
+            return redirect('/profile')
         except BaseException as e:
             form.errors['database'] = str(e)
-            return render_template('register.html', form=forms.UserLoginFormFactory.form())
+            return render_template('new-group.html', form=form)
     else:
-        return render_template('register.html', form=forms.UserLoginFormFactory.form())
+        return render_template('new-group.html', form=form)
 
 @app.route('/profile')
 def user():
@@ -71,10 +57,24 @@ def user():
                  join(models.MemberOf).\
                  filter(models.MemberOf.u_id == currentuser.u_id).all()
         classes = db.session.query(models.RegisteredWith)\
-                 .filter(models.RegisteredWith.u_id == currentuser.u_id)
-        return render_template('user.html', user=currentuser, groups=groups)
+                 .filter(models.RegisteredWith.u_id == currentuser.u_id).all()
+        return render_template('user.html', user=currentuser, groups=groups, classes=classes)
     else:
         return redirect('/')
+
+@app.route('/create/study/<university>/<semester>/<code>', methods=['GET', 'POST'])
+def new_study_group(university, semester, code):
+    form = forms.StudyGroupCreateFormFactory.form()
+    if form.validate_on_submit():
+        try:
+            form.errors.pop('database', None)
+            models.Groups.addNew(form.group_name)
+            return redirect('/profile')
+        except BaseException as e:
+            form.errors['database'] = str(e)
+            return render_template('/create/study/<university>/<semester>/<code>')
+    else:
+        return render_template('/create/study/<university>/<semester>/<code>')
 
 @app.route('/register/', methods=['GET', 'POST'])
 def register():

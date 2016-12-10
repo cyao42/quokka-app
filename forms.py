@@ -4,14 +4,12 @@ from wtforms.validators import DataRequired
 
 class GroupNewFormFactory:
     @staticmethod
-    def form(sections, assignments):
+    def form(sections):
         class F(FlaskForm):
             name = StringField(default='')
-            course_options = [(section, section.course_code) for section in sections]
+            course_options = [(section.course_code, section.course_code) for section in sections]
             course = SelectField('Course', choices=course_options)
-            # if course.data:
-            #     assignment = SelectField('Assignment', choices)
-            # assignment = SelectField('')
+        return F()
 
 class UserLoginFormFactory:
     @staticmethod
