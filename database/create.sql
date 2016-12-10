@@ -31,7 +31,7 @@ g_id INTEGER NOT NULL UNIQUE PRIMARY KEY
 );
 
 CREATE TABLE MemberOf
-(u_id INTEGER NOT NULL UNIQUE REFERENCES Users(u_id),
+(u_id INTEGER NOT NULL REFERENCES Users(u_id),
  g_id INTEGER NOT NULL REFERENCES Groups(g_id),
  is_leader CHAR(3) NOT NULL CHECK (is_leader IN ('yes', 'no')),
  PRIMARY KEY (u_id,g_id)
@@ -55,25 +55,20 @@ FOREIGN KEY (university_name, university_location) REFERENCES University (univer
 );
 
 CREATE TABLE Section
-(section_number INTEGER NOT NULL,
+(section_id INTEGER NOT NULL PRIMARY KEY,
+ section_number INTEGER NOT NULL,
  course_code     VARCHAR(256) NOT NULL,
  course_semester VARCHAR(256) NOT NULL,
  university_name VARCHAR(256) NOT NULL,
  university_location VARCHAR(256) NOT NULL,
- PRIMARY KEY (section_number,course_code,course_semester,university_name,university_location),
 FOREIGN KEY (course_code, course_semester, university_name, university_location) REFERENCES Course (course_code, course_semester, university_name, university_location)
 );
 
 CREATE TABLE RegisteredWith
-(u_id INTEGER NOT NULL UNIQUE REFERENCES Users(u_id),
- section_number INTEGER NOT NULL,
- course_code VARCHAR(256) NOT NULL,
- course_semester VARCHAR(265) NOT NULL,
- university_name VARCHAR(265) NOT NULL,
- university_location VARCHAR(265) NOT NULL,
- PRIMARY KEY (u_id,section_number,course_code,course_semester,university_name,university_location),
-FOREIGN KEY (section_number, course_code, course_semester, university_name, university_location)
-REFERENCES Section (section_number, course_code, course_semester, university_name, university_location)
+(u_id INTEGER NOT NULL REFERENCES Users(u_id),
+ section_id INTEGER NOT NULL,
+ PRIMARY KEY (u_id,section_id),
+FOREIGN KEY (section_id) REFERENCES Section (section_id)
 );
 
 CREATE TABLE Add 
@@ -95,14 +90,10 @@ CREATE TABLE ProjectAssignment
 
 CREATE TABLE AssignedTo 
 (assignment_id INTEGER NOT NULL REFERENCES ProjectAssignment(assignment_id),
- section_number INTEGER NOT NULL,
- course_code VARCHAR(256) NOT NULL,
- course_semester VARCHAR(256) NOT NULL,
- university_name VARCHAR(256) NOT NULL,
- university_location VARCHAR(256) NOT NULL,
- PRIMARY KEY (assignment_id,section_number,course_code,course_semester,university_name,university_location),
-FOREIGN KEY (section_number, course_code, course_semester, university_name, university_location)
-REFERENCES Section (section_number, course_code, course_semester, university_name, university_location)
+ section_id INTEGER NOT NULL,
+ PRIMARY KEY (assignment_id,section_id),
+FOREIGN KEY (section_id)
+REFERENCES Section (section_id)
 );
 
 CREATE TABLE Post
@@ -142,14 +133,10 @@ CREATE TABLE WorkingOn
 
 CREATE TABLE StudyingFor 
 (g_id INTEGER NOT NULL REFERENCES Groups(g_id),
- section_number INTEGER,
- course_code VARCHAR(256) NOT NULL,
- course_semester VARCHAR(256) NOT NULL,
- university_name VARCHAR(256) NOT NULL,
- university_location VARCHAR(256) NOT NULL,
- PRIMARY KEY (g_id,section_number,course_code,course_semester,university_name,university_location),
- FOREIGN KEY (section_number,course_code,course_semester,university_name,university_location)
- REFERENCES Section(section_number,course_code, course_semester, university_name, university_location)
+ section_id INTEGER NOT NULL,
+ PRIMARY KEY (g_id,section_id),
+ FOREIGN KEY (section_id)
+ REFERENCES Section(section_id)
 );
 
 --List the names and groups of all leaders.--
@@ -164,7 +151,3 @@ SELECT Users.name FROM Users NATURAL JOIN NeedTeamPost NATURAL JOIN MemberOf NAT
 --List the names of all users who are not part of a group.--
 
 SELECT Users.name FROM Users EXCEPT (SELECT Users.name FROM Users NATURAL JOIN MemberOf NATURAL JOIN Groups);
-
---List the project descriptions of projects that have been assigned for CS316.
-
-SELECT ProjectAssignment.description FROM ProjectAssignment NATURAL JOIN AssignedTo WHERE AssignedTo.course_code = '431';
