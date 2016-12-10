@@ -36,13 +36,14 @@ def login_user():
 @app.route('/new-group', methods=['GET', 'POST'])
 def new_group():
     global currentuser
-    student_sections = db.session.query(models.RegisteredWith)\
+    student_sections = db.session.query(models.Section)\
+                       .join(models.RegisteredWith)\
                        .filter(models.RegisteredWith.u_id == currentuser.u_id).all()
     form = forms.GroupNewFormFactory.form(student_sections)
     if form.validate_on_submit():
         try:
             form.errors.pop('database', None)
-            # models.Groups.addNew(form.name.data, form.course.data, currentuser)
+            models.Groups.addNew(form.name.data, form.course.data, currentuser)
             return redirect('/profile')
         except BaseException as e:
             form.errors['database'] = str(e)
@@ -56,7 +57,8 @@ def user():
         groups = db.session.query(models.Groups).\
                  join(models.MemberOf).\
                  filter(models.MemberOf.u_id == currentuser.u_id).all()
-        classes = db.session.query(models.RegisteredWith)\
+        classes = db.session.query(models.Section)\
+                  .join(models.RegisteredWith)\
                  .filter(models.RegisteredWith.u_id == currentuser.u_id).all()
         return render_template('user.html', user=currentuser, groups=groups, classes=classes)
     else:

@@ -7,7 +7,7 @@ class GroupNewFormFactory:
     def form(sections):
         class F(FlaskForm):
             name = StringField(default='')
-            course_options = [(section.course_code, section.course_code) for section in sections]
+            course_options = [(str(section.section_id), section.course_code) for section in sections]
             course = SelectField('Course', choices=course_options)
         return F()
 
