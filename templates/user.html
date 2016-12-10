@@ -2,6 +2,7 @@
 {% block heading %}User Information: {{user.name}}{% endblock %}
 {% block content %}
 <p>Name: {{user.name}}</p>
+
 <h2>My Groups:</h2>
 {% if groups|length > 0 %}
 <ul>
@@ -10,10 +11,14 @@
 {% else %}
 <p>You are not in any groups!</p>
 {% endif %}
+
 <h2>My Classes:</h2>
 {% if classes|length > 0 %}
 <ul>
-{% for classThing in classes %}<li>{{classThing.course_code}}</li>{% endfor %}
+{% for classThing in classes %}
+<li>{{classThing.course_code}} </li>
+<a href="{{url_for('new_group', sectionid=classThing.section_id)}}">Add Group</a>
+{% endfor %}
 </ul>
 {% else %}
 <p>You are not in any classes!</p>
