@@ -1,0 +1,85 @@
+body {
+	background-color: LightSteelBlue;
+}
+
+h1 {
+	color: WhiteSmoke;
+	font-size: 36px;
+	font-family: Cooper Black;
+        font-weight: bold;
+	text-align: center;
+}
+
+#header {
+	background-color: DarkSlateBlue;
+	position: relative;
+	padding: 10px 10px 10px 10px;
+	border-radius: 10px 10px 10px 10px;
+        border:3px outset WhiteSmoke;
+}
+
+p {
+        color: Black;
+        font-size: 16px;
+        font-family: Helvetica;
+}
+
+#post {
+        background-color: WhiteSmoke;
+        position: relative;
+        padding: 10px 10px 10px 10px;
+        border-radius: 10px 10px 10px 10px;
+        border:3px outset black;
+}
+
+h6 { margin-top:1px;
+     margin-left:1px;
+     margin-bottom:1px;
+     margin-right:1px;
+}
+
+.filter {
+	background-color: WhiteSmoke;
+        display:inline;
+	border-radius: 10px 10px 10px 10px;
+	color: Black;
+	font-family: Cooper Black;
+	padding: 10px 50px 10px 50px;
+	border: 2px outset silver;
+        margin-left:110px;	
+}
+
+.post {
+        background-color: WhiteSmoke;
+        display:inline;
+        border-radius: 10px 10px 10px 10px;
+        color: Black;
+        font-family: Cooper Black;
+        padding: 10px 50px 10px 50px;
+        border: 2px outset silver;
+        margin-left:110px;      
+}
+
+.need {
+        background-color: WhiteSmoke;
+        display:inline;
+        border-radius: 10px 10px 10px 10px;
+        color: Black;
+        font-family: Cooper Black;
+        padding: 10px 50px 10px 50px;
+        border: 2px outset silver;
+        margin-left:90px;      
+}
+
+#request {
+        background-color: LemonChiffon;
+        border-radius: 10px 10px 10px 10px;
+        border:2px outset silver;
+}
+
+img {
+       border-radius:50%;
+       margin:auto;
+       display:block;
+       border:3px solid silver;
+}

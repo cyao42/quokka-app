@@ -12,15 +12,13 @@
 <p>You are not in any groups!</p>
 {% endif %}
 
-<p><a href="/new-group">Add Group</a></p>
-
 <h2>My Classes:</h2>
 {% if classes|length > 0 %}
 <ul>
-{% for class in classes %}
-<li>{{class.course_code}} {{class.course_semester}} {{class.university_name}}
-<a href="{{url_for('new_group', sectionid=class.section_id)}}">Add Group</a>
-</li>{% endfor %}
+{% for classThing in classes %}
+<li>{{classThing.course_code}} </li>
+<a href="{{url_for('new_group', sectionid=classThing.section_id)}}">Add Group</a>
+{% endfor %}
 </ul>
 {% else %}
 <p>You are not in any classes!</p>

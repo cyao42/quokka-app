@@ -15,9 +15,13 @@ def login_user():
     form = forms.UserLoginFormFactory.form()
     user = currentuser
     if form.validate_on_submit():
+        print "FORM VALIDATED"
         try:
+            print "QUERY FOR USER:"
             user = db.session.query(models.Users)\
-                          .filter(models.Users.email == form.email.data).first()
+                            .filter(models.Users.email == form.email.data).first()
+            print "USER:"
+            print user.u_id
             if user:
                 if user.password == form.password.data:
                     currentuser = user
@@ -93,6 +97,18 @@ def register():
             return render_template('register.html', form=form)
     else:
         return render_template('register.html', form=form)
+
+@app.route('/classfeed/<id>')
+def classfeed(id):
+    course = db.session.query(models.Course)\
+       .filter(models.Class.id == id).one()
+    #assignments = models.Course.getAssignments(course.course_code)
+    
+    return render_template('classfeed.html', course=course)
+
+def getPosts(assignment): 
+    posts = assignment.posts
+    return render_template('classfeed-posts.html', posts=posts, assignment=assignment)
 
 @app.template_filter('pluralize')
 def pluralize(number, singular='', plural='s'):
