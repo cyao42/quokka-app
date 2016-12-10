@@ -2,13 +2,18 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, BooleanField, IntegerField, SelectField, PasswordField
 from wtforms.validators import DataRequired
 
+
 class GroupNewFormFactory:
     @staticmethod
-    def form(sections):
+    def form(assignments):
+#    def form(sections):
         class F(FlaskForm):
             name = StringField(default='')
-            course_options = [(str(section.section_id), section.course_code) for section in sections]
-            course = SelectField('Course', choices=course_options)
+            assign_options = [("none", "Study Group")]
+            assign_options.extend([(str(assign.assignment_id), assign.assign_id) for assign in assignments])
+            assign = SelectField('Assignment', choices=assign_options)
+#            course_options = [(str(section.section_id), section.course_code) for section in sections]
+#            course = SelectField('Course', choices=course_options)
         return F()
 
 class UserLoginFormFactory:

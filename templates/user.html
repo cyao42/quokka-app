@@ -18,7 +18,9 @@
 {% if classes|length > 0 %}
 <ul>
 {% for class in classes %}
-<li>{{class.course_code}} {{class.course_semester}} {{class.university_name}}</li>{% endfor %}
+<li>{{class.course_code}} {{class.course_semester}} {{class.university_name}}
+<a href="{{url_for('new_group', sectionid=class.section_id)}}">Add Group</a>
+</li>{% endfor %}
 </ul>
 {% else %}
 <p>You are not in any classes!</p>

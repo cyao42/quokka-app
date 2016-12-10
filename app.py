@@ -33,23 +33,23 @@ def login_user():
     else:
         return render_template('login.html', form=form, user=currentuser)
 
-@app.route('/new-group', methods=['GET', 'POST'])
-def new_group():
+@app.route('/<sectionid>/new-group', methods=['GET', 'POST'])
+def new_group(sectionid):
     global currentuser
-    student_sections = db.session.query(models.Section)\
-                       .join(models.RegisteredWith)\
-                       .filter(models.RegisteredWith.u_id == currentuser.u_id).all()
-    form = forms.GroupNewFormFactory.form(student_sections)
+    assignments = db.session.query(models.ProjectAssignment)\
+                      .join(models.AssignedTo)\
+                      .filter(models.AssignedTo.section_id == sectionid)
+    form = forms.GroupNewFormFactory.form(assignments)
     if form.validate_on_submit():
         try:
             form.errors.pop('database', None)
-            models.Groups.addNew(form.name.data, form.course.data, currentuser)
+            # models.Groups.addNew(form.name.data, form.course.data, currentuser)
             return redirect('/profile')
         except BaseException as e:
             form.errors['database'] = str(e)
-            return render_template('new-group.html', form=form)
+            return render_template('new-group.html', form=form, sectionid=sectionid)
     else:
-        return render_template('new-group.html', form=form)
+        return render_template('new-group.html', form=form, sectionid=sectionid)
 
 @app.route('/profile')
 def user():

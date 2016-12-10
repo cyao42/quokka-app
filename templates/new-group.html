@@ -1,7 +1,7 @@
 {% extends 'layout.html' %}
 {% block heading %}New Group Information: {% endblock %}
 {% block content %}
-<form action="{{url_for('new_group')}}" method="POST">
+<form action="{{url_for('new_group', sectionid=sectionid)}}" method="POST">
   {{form.csrf_token}}
   <p>
     Name: {{form.name}}
@@ -10,9 +10,9 @@
     {% endif %}
   </p>
   <p>
-    Course: {{form.course}}
-    {% if form.course.errors %}
-    <ul>{% for error in form.course.errors %}<li>ERROR: {{error}}</li>{% endfor %}</ul>
+    Assignment: {{form.assign}}
+    {% if form.assign.errors %}
+    <ul>{% for error in form.assign.errors %}<li>ERROR: {{error}}</li>{% endfor %}</ul>
     {% endif %}
   </p>
   <input type="reset" value="Reset"/>
