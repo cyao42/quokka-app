@@ -15,13 +15,9 @@ def login_user():
     form = forms.UserLoginFormFactory.form()
     user = currentuser
     if form.validate_on_submit():
-        print "FORM VALIDATED"
         try:
-            print "QUERY FOR USER:"
             user = db.session.query(models.Users)\
                             .filter(models.Users.email == form.email.data).first()
-            print "USER:"
-            print user.u_id
             if user:
                 if user.password == form.password.data:
                     currentuser = user
@@ -47,7 +43,7 @@ def new_group(sectionid):
     if form.validate_on_submit():
         try:
             form.errors.pop('database', None)
-            # models.Groups.addNew(form.name.data, form.course.data, currentuser)
+            models.Groups.addNew(form.name.data, sectionid, form.assign.data, currentuser)
             return redirect('/profile')
         except BaseException as e:
             form.errors['database'] = str(e)
