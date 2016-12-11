@@ -48,8 +48,8 @@ def login_user():
     else:
         return render_template('login.html', form=form, user=currentuser)
 
-@app.route('/new-group', methods=['GET', 'POST'])
-def new_group():
+@app.route('/<sectionid>/new-group', methods=['GET', 'POST'])
+def new_group(sectionid):
     global currentuser
     if not currentuser:
         return redirect('/')
@@ -61,16 +61,13 @@ def new_group():
     if form.validate_on_submit():
         try:
             form.errors.pop('database', None)
-            models.SchoolGroup.addNew(form.name.data, form.course.data, currentuser)
-            # if form.assignment:
-            #     models.ProjectGroup.addNew(form.name, form.course, form.assignment)
-            # else:
-            return redirect('/')
+            models.Groups.addNew(form.name.data, sectionid, form.assign.data, currentuser)
+            return redirect('/profile')
         except BaseException as e:
             form.errors['database'] = str(e)
-            return render_template('register.html', form=forms.UserLoginFormFactory.form())
+            return render_template('new-group.html', form=form, sectionid=sectionid)
     else:
-        return render_template('register.html', form=forms.UserLoginFormFactory.form())
+        return render_template('new-group.html', form=form, sectionid=sectionid)
 
 @app.route('/profile')
 def user():

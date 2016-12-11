@@ -1,6 +1,9 @@
 {% extends 'layout.html' %}
 {% block heading %}My Information: {% endblock %}
 {% block content %}
+<head>
+  <link type="text/css" rel="stylesheet" href="/static/css/myclasses.css"/>
+</head>
 <p>Name: {{user.name}}</p>
 <p>Phone: {{user.phone}}</p>
 <p>E-mail: {{user.email}}</p>
@@ -33,8 +36,7 @@
 {% endfor %}
 </ul>
 {% else %}
-<p>You have not added any classes!</p>
+<p>Create a class <a href="/register-class">here</a>!</p>
+<p>Create a new assignment <a href="/new-assignment">here</a>!</p>
 {% endif %}
-<p>Register for a class <a href="/register-class">here</a>!</p>
-<p>Add a new assignment <a href="/new-assignment">here</a>!</p>
 {% endblock %}
