@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, BooleanField, IntegerField, SelectField, PasswordField
-from wtforms.validators import DataRequired
+from wtforms.validators import DataRequired, Length, Required, EqualTo
 
 
 class GroupNewFormFactory:
@@ -26,9 +26,11 @@ class UserRegisterFormFactory:
     def form():
         class F(FlaskForm):
             name = StringField(default='')
-            phone = StringField(default='')
-            email = StringField(default='')
-            user_type = SelectField('User Type', choices=[('pro', 'Professor'), ('stu', 'Student')])
+            password = PasswordField('Password', [Required(), Length(8, 256), EqualTo('confirm_pw', message="Passwords don't match")])
+            confirm_pw = PasswordField('Confirm Password', [Required()])
+            phone = StringField('Phone Number')
+            email = StringField('Email', [Required()])
+            user_type = SelectField('User Type', choices=[('stu', 'Student'), ('pro', 'Professor')])
         return F()
 
 class ClassRegisterFormFactory:

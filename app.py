@@ -1,4 +1,4 @@
-from flask import Flask, render_template, redirect, url_for
+from flask import Flask, render_template, redirect, url_for, request
 from flask_sqlalchemy import SQLAlchemy
 import models
 import forms
@@ -17,24 +17,18 @@ def login_user():
     if form.validate_on_submit():
         try:
             user = db.session.query(models.Users)\
-                            .filter(models.Users.email == form.email.data).first()
-            if user:
-                if user.password == form.password.data:
-                    currentuser = user
-                    form.errors.pop('database', None)
-                    return redirect('/profile')
-                else:
-                    return render_template('login.html', form=form, user=None, msg="Incorrect password!")
-            else:
-                return render_template('login.html', form=form, user=None, msg="No user with that email")
+                          .filter(models.Users.email == form.email.data).first()
+            currentuser = user
+            form.errors.pop('database', None)
+            return redirect('/profile')
         except BaseException as e:
             form.errors['database'] = str(e)
             return render_template('login.html', form=form, user=currentuser)
     else:
         return render_template('login.html', form=form, user=currentuser)
 
-@app.route('/<sectionid>/new-group', methods=['GET', 'POST'])
-def new_group(sectionid):
+@app.route('/new-group', methods=['GET', 'POST'])
+def new_group():
     global currentuser
     if not currentuser:
         return redirect('/')
@@ -46,25 +40,22 @@ def new_group(sectionid):
     if form.validate_on_submit():
         try:
             form.errors.pop('database', None)
-            models.Groups.addNew(form.name.data, sectionid, form.assign.data, currentuser)
-            return redirect('/profile')
+            models.SchoolGroup.addNew(form.name.data, form.course.data, currentuser)
+            # if form.assignment:
+            #     models.ProjectGroup.addNew(form.name, form.course, form.assignment)
+            # else:
+            return redirect('/')
         except BaseException as e:
             form.errors['database'] = str(e)
-            return render_template('new-group.html', form=form, sectionid=sectionid)
+            return render_template('register.html', form=forms.UserLoginFormFactory.form())
     else:
-        return render_template('new-group.html', form=form, sectionid=sectionid)
+        return render_template('register.html', form=forms.UserLoginFormFactory.form())
 
 @app.route('/profile')
 def user():
     global currentuser
     if(currentuser):
-        groups = db.session.query(models.Groups).\
-                 join(models.MemberOf).\
-                 filter(models.MemberOf.u_id == currentuser.u_id).all()
-        classes = db.session.query(models.Section)\
-                  .join(models.RegisteredWith)\
-                 .filter(models.RegisteredWith.u_id == currentuser.u_id).all()
-        return render_template('user.html', user=currentuser, groups=groups, classes=classes)
+        return render_template('user.html', user=currentuser)
     else:
         return redirect('/')
 
@@ -93,28 +84,42 @@ def register_class():
 
 @app.route('/register-user/', methods=['GET', 'POST'])
 def register_user():
+    global currentuser
     form = forms.UserRegisterFormFactory.form()
     if form.validate_on_submit():
         try:
             form.errors.pop('database', None)
-            models.Users.addNew(form.name.data, form.phone.data,
-                                form.email.data, form.user_type.data)
-            return redirect('/')
+            email_check = db.session.query(models.Users)\
+                          .filter(models.Users.email == form.email.data).first()
+            if(email_check):
+                return render_template('register.html', form=form, msg="User with that email already exists")
+            else:
+                models.Users.addNew(form.name.data, form.phone.data, form.email.data, form.user_type.data, form.password\
+.data)
+                currentuser = db.session.query(models.Users).filter(models.Users.email == form.email.data).first()
+                return redirect('/profile')
         except BaseException as e:
             form.errors['database'] = str(e)
             return render_template('register.html', form=form)
     else:
         return render_template('register.html', form=form)
 
-@app.route('/classfeed/<id>')
+@app.route('/feed/<id>')
 def classfeed(id):
-    course = db.session.query(models.Course)\
-       .filter(models.Class.id == id).one()
-    #assignments = models.Course.getAssignments(course.course_code)
-    
-    return render_template('classfeed.html', course=course)
+    section = db.session.query(models.Section)\
+        .filter(models.Section.section_id == id).one()
+    course_code = section.course_code
+    assignments = db.session.query(models.ProjectAssignment)\
+                    .join(models.AssignedTo)\
+                    .join(models.Section)\
+                    .filter(models.Section.section_id == id)
+    return render_template('classfeed.html', section = section, assignments = assignments)
 
-def getPosts(assignment): 
+@app.route('/classfeed/', methods=['GET', 'POST'])
+def getPosts(): 
+    assignment_id = request.form.get('selected_assignment')
+    assignment = db.session.query(models.ProjectAssignment)\
+        .filter(models.ProjectAssignment.assignment_id == assignment_id).one()
     posts = assignment.posts
     return render_template('classfeed-posts.html', posts=posts, assignment=assignment)
 
