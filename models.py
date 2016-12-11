@@ -107,6 +107,16 @@ class RegisteredWith(db.Model):
     __tablename__ = 'registeredwith'
     u_id = db.Column('u_id', db.Integer(), db.ForeignKey('users.u_id'), primary_key=True)
     section_id = db.Column('section_id', db.Integer(), db.ForeignKey('section.section_id'), primary_key=True)
+    @staticmethod
+    def addNew(u_id, section_id):
+        try:
+            db.session.execute('INSERT INTO registeredwith VALUES(:u_id, :section_id)',
+                               dict(u_id=u_id, section_id=section_id))
+            db.session.commit()
+        except Exception as e:
+            db.session.rollback()
+            raise e
+
 
 class Add(db.Model):
     __tablename__ = 'join'
