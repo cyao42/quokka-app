@@ -1,5 +1,6 @@
 from flask import Flask, render_template, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import and_
 import models
 import forms
 
@@ -102,13 +103,27 @@ def register():
 def classfeed(id):
     course = db.session.query(models.Course)\
        .filter(models.Class.id == id).one()
-    #assignments = models.Course.getAssignments(course.course_code)
-    
+    assignments = models.Course.getAssignments(course.course_code) 
     return render_template('classfeed.html', course=course)
 
 def getPosts(assignment): 
     posts = assignment.posts
     return render_template('classfeed-posts.html', posts=posts, assignment=assignment)
+
+@app.route('/mygroups/')
+def myGroups():
+    return render_template('mygroups.html')
+
+@app.route('/myclasses/')
+def myClasses():
+    return render_template('myclasses.html')
+
+@app.route('/membersof/<g_id>')
+def membersOf(g_id):
+    member = db.session.query(models.Student)\
+       .join(models.MemberOf, (models.Student.u_id == models.MemberOf.u_id))\
+       .filter(models.MemberOf.g_id == g_id).all()
+    return render_template('membersof.html', member=member)
 
 @app.template_filter('pluralize')
 def pluralize(number, singular='', plural='s'):

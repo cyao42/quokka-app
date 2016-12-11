@@ -1,26 +1,26 @@
 <!DOCTYPE HTML>
 <html>
   <head>
-    <link type="text/css" rel="stylesheet" href="/static/css/myclasses.css"/>
-    <title>My Classes</title>
+    <link type="text/css" rel="stylesheet" href="/static/css/list.css"/>
+    <title>My Groups</title>
   </head>
   <body>
 <img src="/static/img/quokka.PNG"/>
-    <div id="header">
       <h1>My Classes</h1>
-    </div>
     <br></br>
-     <div id="groups">
+     <div class="groups">
+        <section>
         <h3>
         Class: CS 316 Intro to Databases
         <h3>
         Course Project: Quokka
         </h3>
-     <div id="members">
+        </section>
+     <aside>
      <h2>
-     SeePosts
+    <a href="{{url_for('course_id')}}">See Posts</a>
      </h2>
-     </div>
+     </aside>
      </div>
   </body>
 </html>
