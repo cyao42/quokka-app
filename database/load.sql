@@ -1,19 +1,19 @@
-\COPY Users(u_id, name, phone, email) FROM 'data/Users.dat' WITH DELIMITER ',' NULL '' CSV
-\COPY Professor(u_id, name, phone, email) FROM 'data/Professor.dat' WITH DELIMITER ',' NULL '' CSV
-\COPY Student(u_id, name, phone, email, first_major, second_major, grad_year) FROM 'data/Student.dat' WITH DELIMITER ',' NULL '' CSV
+\COPY Users(u_id, name, phone, email, password) FROM 'data/Users.dat' WITH DELIMITER ',' NULL '' CSV
+\COPY Professor(u_id, name, phone, email, password) FROM 'data/Professor.dat' WITH DELIMITER ',' NULL '' CSV
+\COPY Student(u_id, name, phone, email, password, first_major, second_major, grad_year) FROM 'data/Student.dat' WITH DELIMITER ',' NULL '' CSV
 \COPY Groups(group_name, g_id) FROM 'data/Groups.dat' WITH DELIMITER ',' NULL '' CSV
 \COPY MemberOf(u_id, g_id, is_leader) FROM 'data/MemberOf.dat' WITH DELIMITER ',' NULL '' CSV
 \COPY University(university_name, university_location) FROM 'data/University.dat' WITH DELIMITER ',' NULL '' CSV
-\COPY Class(class_code, class_semester, university_name, university_location) FROM 'data/Class.dat' WITH DELIMITER ',' NULL '' CSV
-\COPY Section(section_number, class_code, class_semester, university_name, university_location) FROM 'data/Section.dat' WITH DELIMITER ',' NULL '' CSV
-\COPY RegisteredWith(u_id, section_number, class_code, class_semester, university_name, university_location) FROM 'data/RegisteredWith.dat' WITH DELIMITER ',' NULL '' CSV
+\COPY Course(course_code, course_semester, university_name, university_location) FROM 'data/Class.dat' WITH DELIMITER ',' NULL '' CSV
+\COPY Section(section_id, section_number, course_code, course_semester, university_name, university_location) FROM 'data/Section.dat' WITH DELIMITER ',' NULL '' CSV
+\COPY RegisteredWith(u_id, section_id) FROM 'data/RegisteredWith.dat' WITH DELIMITER ',' NULL '' CSV
 \COPY Add(j_id, g_id, message, approved, sent_by, sent_to) FROM 'data/Add.dat' WITH DELIMITER ',' NULL '' CSV
 \COPY ProjectAssignment(assignment_id, max_members, date_assigned, date_due, description) FROM 'data/ProjectAssignment.dat' WITH DELIMITER ',' NULL '' CSV
-\COPY AssignedTo(assignment_id, section_number, class_code, class_semester, university_name, university_location) FROM 'data/AssignedTo.dat' WITH DELIMITER ',' NULL '' CSV
+\COPY AssignedTo(assignment_id, section_id) FROM 'data/AssignedTo.dat' WITH DELIMITER ',' NULL '' CSV
 \COPY Post(assignment_id, time_posted, message) FROM 'data/Post.dat' WITH DELIMITER ',' NULL '' CSV
 \COPY NeedTeamPost(assignment_id, u_id) FROM 'data/NeedTeamPost.dat' WITH DELIMITER ',' NULL '' CSV
 \COPY NeedMemberPost(assignment_id, g_id) FROM 'data/NeedMemberPost.dat' WITH DELIMITER ',' NULL '' CSV
 \COPY ProjectGroup(g_id, name) FROM 'data/ProjectGroup.dat' WITH DELIMITER ',' NULL '' CSV
 \COPY StudyGroup(g_id, name) FROM 'data/StudyGroup.dat' WITH DELIMITER ',' NULL '' CSV
 \COPY WorkingOn(g_id, assignment_id) FROM 'data/WorkingOn.dat' WITH DELIMITER ',' NULL '' CSV
-\COPY StudyingFor(g_id, section_number, class_code, class_semester, university_name, university_location) FROM 'data/StudyingFor.dat' WITH DELIMITER ',' NULL '' CSV
+\COPY StudyingFor(g_id, section_id) FROM 'data/StudyingFor.dat' WITH DELIMITER ',' NULL '' CSV

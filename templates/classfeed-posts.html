@@ -1,0 +1,33 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <link type="text/css" rel="stylesheet" href="/static/css/posts.css"/>
+    <title>Posts for Class</title>
+  </head>
+  <body>
+<img src="/static/img/quokka.PNG"/>
+    <div id="header">
+      <h1>Posts for Class</h1>
+    <ul id="top">
+    <li class="filter">Filter</li>
+    <li class="post">AddPost</li>
+    </ul>
+    </div>
+    <br></br>
+    <div>
+      <div id="request">
+      <ul id="need">
+      <li class="need">NeedTeam</li>
+      <li class="need">NeedMembers</li>
+      </ul>
+      </div>
+      <br></br>
+      {% for post in posts %}
+      <div id="post">
+        <h6>{{post.time_posted}}</h6>
+        <p>{{post.message}}</p>
+      </div>
+      {% endfor %}
+    </div>	
+  </body>
+</html>

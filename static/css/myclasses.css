@@ -1,0 +1,54 @@
+body { background-color: Lavender;
+}
+
+h1 {
+        color: WhiteSmoke;
+        font-size: 36px;
+        font-family: Cooper Black;
+        font-weight: bold;
+        text-align: center;
+}
+
+#header {
+        background-color: DarkSlateBlue;
+        position: relative;
+        padding: 10px 10px 10px 10px;
+        border-radius: 10px 10px 10px 10px;
+        border:3px outset WhiteSmoke;
+}
+
+#groups {
+        background-color: WhiteSmoke;
+        position: relative;
+        padding: 10px 10px 10px 10px;
+        border-radius: 10px 10px 10px 10px;
+        border:3px outset black;
+}
+
+img { border-radius:50%;
+      margin:auto;
+      display:block;
+      border:3px outset black;
+}
+
+h3 {
+
+}
+
+h2{
+text-align:center;
+}
+
+#members {
+        background-color: LightCoral;
+        display:inline-block;
+        border-radius:50%;
+        color: Black;
+        font-family: Cooper Black;
+        padding: 1px 5px 1px 5px;
+        border: 2px outset LightCoral;
+        margin:auto;
+        margin-left:600px;
+}
+
+

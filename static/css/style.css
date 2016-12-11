@@ -1,7 +1,8 @@
 body {
-    color: blue;
-    background: grey;
-    font-family: Helvetica, sans-serif;
+    color: DarkSlateBlue;
+    background: Lavender;
+    font-family: 'Cooper Black', serif;
+    text-align: center;
 
     .form{
        display: inline-block;
@@ -19,4 +20,13 @@ title{
 
 .form{
     display: inline-block;
+}
+
+img{
+    border-radius:50%;
+    border:3px solid black;
+}
+
+h1 {
+    font-size:60px;
 }

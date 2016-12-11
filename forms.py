@@ -1,17 +1,17 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, BooleanField, IntegerField, SelectField, PasswordField
-from wtforms.validators import DataRequired
+from wtforms.validators import DataRequired, Length, Required, EqualTo
+
 
 class GroupNewFormFactory:
     @staticmethod
-    def form(sections, assignments):
+    def form(assignments):
         class F(FlaskForm):
             name = StringField(default='')
-            course_options = [(section, section.course_code) for section in sections]
-            course = SelectField('Course', choices=course_options)
-            # if course.data:
-            #     assignment = SelectField('Assignment', choices)
-            # assignment = SelectField('')
+            assign_options = [("none", "Study Group")]
+            assign_options.extend([(str(assign.assignment_id), assign.assignment_id) for assign in assignments])
+            assign = SelectField('Assignment', choices=assign_options)
+        return F()
 
 class UserLoginFormFactory:
     @staticmethod
@@ -21,87 +21,21 @@ class UserLoginFormFactory:
             password = PasswordField(default='')
         return F()
 
-class UserNewFormFactory:
+class UserRegisterFormFactory:
     @staticmethod
     def form():
         class F(FlaskForm):
             name = StringField(default='')
-            phone = StringField(default='')
-            email = StringField(default='')
-            user_type = SelectField('User Type', choices=[('pro', 'Professor'), ('stu', 'Student')])
+            password = PasswordField('Password', [Required(), Length(8, 256), EqualTo('confirm_pw', message="Passwords don't match")])
+            confirm_pw = PasswordField('Confirm Password', [Required()])
+            phone = StringField('Phone Number')
+            email = StringField('Email', [Required()])
+            user_type = SelectField('User Type', choices=[('stu', 'Student'), ('pro', 'Professor')])
         return F()
 
-class DrinkerNewFormFactory:
+class ClassRegisterFormFactory:
     @staticmethod
-    def form(beers, bars):
+    def form():
         class F(FlaskForm):
-            name = StringField(default='')
-            address = StringField(default='')
-            @staticmethod
-            def beer_field_name(index):
-                return 'beer_{}'.format(index)
-            def beer_fields(self):
-                for i, beer in enumerate(beers):
-                    yield beer.name, getattr(self, F.beer_field_name(i))
-            def get_beers_liked(self):
-                for beer, field in self.beer_fields():
-                    if field.data:
-                        yield beer
-            @staticmethod
-            def bar_field_name(index):
-                return 'bar_{}'.format(index)
-            def bar_fields(self):
-                for i, bar in enumerate(bars):
-                    yield bar.name, getattr(self, F.bar_field_name(i))
-            def get_bars_frequented(self):
-                for bar, field in self.bar_fields():
-                    if field.data != 0:
-                        yield bar, field.data
-        for i, beer in enumerate(beers):
-            field_name = F.beer_field_name(i)
-            default = None
-            setattr(F, field_name, BooleanField(default=default))
-        for i, bar in enumerate(bars):
-            field_name = F.bar_field_name(i)
-            default = 0
-            setattr(F, field_name, IntegerField(default=default))
-        return F()
-
-class DrinkerEditFormFactory:
-    @staticmethod
-    def form(drinker, beers, bars):
-        class F(FlaskForm):
-            name = StringField(default=drinker.name)
-            address = StringField(default=drinker.address)
-            @staticmethod
-            def beer_field_name(index):
-                return 'beer_{}'.format(index)
-            def beer_fields(self):
-                for i, beer in enumerate(beers):
-                    yield beer.name, getattr(self, F.beer_field_name(i))
-            def get_beers_liked(self):
-                for beer, field in self.beer_fields():
-                    if field.data:
-                        yield beer
-            @staticmethod
-            def bar_field_name(index):
-                return 'bar_{}'.format(index)
-            def bar_fields(self):
-                for i, bar in enumerate(bars):
-                    yield bar.name, getattr(self, F.bar_field_name(i))
-            def get_bars_frequented(self):
-                for bar, field in self.bar_fields():
-                    if field.data != 0:
-                        yield bar, field.data
-        beers_liked = [like.beer for like in drinker.likes]
-        for i, beer in enumerate(beers):
-            field_name = F.beer_field_name(i)
-            default = 'checked' if beer.name in beers_liked else None
-            setattr(F, field_name, BooleanField(default=default))
-        bars_frequented = {frequent.bar: frequent.times_a_week\
-                           for frequent in drinker.frequents}
-        for i, bar in enumerate(bars):
-            field_name = F.bar_field_name(i)
-            default = bars_frequented[bar.name] if bar.name in bars_frequented else 0
-            setattr(F, field_name, IntegerField(default=default))
+            section_code = StringField(default='')
         return F()
