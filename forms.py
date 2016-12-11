@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, BooleanField, IntegerField, SelectField, PasswordField
-from wtforms.validators import DataRequired
+from wtforms import StringField, BooleanField, IntegerField, SelectField, PasswordField, SelectMultipleField, DateTimeField, TextAreaField
+from wtforms.validators import DataRequired, Length, Required, EqualTo
 
 
 class GroupNewFormFactory:
@@ -26,9 +26,11 @@ class UserRegisterFormFactory:
     def form():
         class F(FlaskForm):
             name = StringField(default='')
-            phone = StringField(default='')
-            email = StringField(default='')
-            user_type = SelectField('User Type', choices=[('pro', 'Professor'), ('stu', 'Student')])
+            password = PasswordField('Password', [Required(), Length(8, 256), EqualTo('confirm_pw', message="Passwords don't match")])
+            confirm_pw = PasswordField('Confirm Password', [Required()])
+            phone = StringField('Phone Number')
+            email = StringField('Email', [Required()])
+            user_type = SelectField('User Type', choices=[('stu', 'Student'), ('pro', 'Professor')])
         return F()
 
 class ClassRegisterFormFactory:
@@ -37,3 +39,28 @@ class ClassRegisterFormFactory:
         class F(FlaskForm):
             section_code = StringField(default='')
         return F()
+
+class AssignmentNewFormFactory:
+    @staticmethod
+    def form(sections):
+        class F(FlaskForm):
+            @staticmethod
+            def section_field_name(id):
+                return 'section_{}'.format(id)
+            def section_fields(self):
+                for s in sections:
+                    yield s.section_id, str(s.section_number)+" "+s.course_code, getattr(self, F.section_field_name(s.section_id))
+            def get_sections(self):
+                for s_id, s_name, s_field in self.section_fields():
+                    if s_field.data:
+                        yield s_id
+            max_members = IntegerField()
+            date_assigned = StringField()
+            date_due = StringField()
+            description = TextAreaField()
+        for s in sections:
+            field_name = F.section_field_name(s.section_id)
+            default = None
+            setattr(F, field_name, BooleanField(default=default))
+        return F()
+
