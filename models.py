@@ -100,26 +100,8 @@ class Course(db.Model):
     course_semester = db.Column('course_semester', db.String(10), primary_key=True)
     university_name = db.Column('university_name', db.String(256), db.ForeignKey('university.university_name'), primary_key=True)
     university_location = db.Column('university_location', db.String(256), db.ForeignKey('university.university_location'), primary_key=True)
-
-    #assignments_to = orm.relationship('AssignedTo', foreign_keys=[course_code])
-
-    # assignments = db.session.query(ProjectAssignment).\
-    #             select_from(join(AssignedTo, ProjectAssignment)).\
-    #             filter(AssignedTo.course_code == course_code, AssignedTo.assignment_id == ProjectAssignment.assignment_id)
-
-    # def getAssignments(course_code):
-    #     result = []
-    #     try:
-    #       result = db.session.execute(
-    #         'SELECT ProjectAssignment.assignment_id, ProjectAssignment.description, ProjectAssignment.date_due, ProjectAssignment.max_members 
-    #         FROM ((SELECT * FROM Course WHERE course_code = :course_code) c NATURAL JOIN AssignedTo 
-    #                 NATURAL JOIN ProjectAssignment'), 
-    #                 dict(course_code = course_code))
-    #     db.session.commit()
-    #     except Exception as e:
-    #     db.session.rollback()
-    #     raise e
-    #     return result
+    course_name = db.Column('course_name', db.String(256))
+    course_pre = db.Column('course_pre', db.String(256))
 
 class Section(db.Model):
     __tablename__ = 'section'
@@ -129,16 +111,6 @@ class Section(db.Model):
     course_semester = db.Column('course_semester', db.String(256), db.ForeignKey('course.course_semester'), primary_key=True)
     university_name = db.Column('university_name', db.String(256), db.ForeignKey('university.university_name'), primary_key=True)
     university_location = db.Column('university_location', db.String(256), db.ForeignKey('university.university_location'), primary_key=True)
-    # @staticmethod
-    # def getAssignments(section_id):
-    #     # assignments = db.session.query(Section,AssignedTo,ProjectAssignment).filter(Section.section_id == section_id).\
-    #     #                 filter(Section.section_id == AssignedTo.section_id).\
-    #     #                 filter(AssignedTo.assignment_id == ProjectAssignment.assignment_id).all()
-    #     # assignments = db.session.query(ProjectAssignment)\
-    #     #                 .join(AssignedTo)\
-    #     #                 .join(Section)\
-    #     #                 filter(Section.section_id == section_id)
-    #     return assignments
 
 class RegisteredWith(db.Model):
     __tablename__ = 'registeredwith'

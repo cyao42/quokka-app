@@ -1,5 +1,6 @@
 from flask import Flask, render_template, redirect, url_for, request
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import and_
 import models
 import forms
 
@@ -12,15 +13,35 @@ currentuser = None
 @app.route('/', methods=['GET', 'POST'])
 def login_user():
     global currentuser
+    global isStudent
     form = forms.UserLoginFormFactory.form()
     user = currentuser
     if form.validate_on_submit():
         try:
-            user = db.session.query(models.Users)\
-                          .filter(models.Users.email == form.email.data).first()
-            currentuser = user
-            form.errors.pop('database', None)
-            return redirect('/profile')
+            isStudent = True
+            user = db.session.query(models.Student)\
+                            .filter(models.Student.email == form.email.data).first()
+            if user:
+                isStudent = True
+                if user.password == form.password.data:
+                    currentuser = user
+                    form.errors.pop('database', None)
+                    return redirect('/profile')
+                else:
+                    return render_template('login.html', form=form, user=None, msg="Incorrect password!")
+            else:
+                user = db.session.query(models.Professor)\
+                            .filter(models.Professor.email == form.email.data).first()
+                if user:
+                    isStudent = False
+                    if user.password == form.password.data:
+                        currentuser = user
+                        form.errors.pop('database', None)
+                        return redirect('/profile')
+                    else:
+                        return render_template('login.html', form=form, user=None, msg="Incorrect password!")
+                else:
+                    return render_template('login.html', form=form, user=None, msg="No user with that email")
         except BaseException as e:
             form.errors['database'] = str(e)
             return render_template('login.html', form=form, user=currentuser)
@@ -55,7 +76,14 @@ def new_group():
 def user():
     global currentuser
     if(currentuser):
-        return render_template('user.html', user=currentuser)
+        groups = db.session.query(models.Groups).\
+                 join(models.MemberOf).\
+                 filter(models.MemberOf.u_id == currentuser.u_id).all()
+        classes = db.session.query(models.Section, models.Course.course_name, models.Course.course_pre, models.Section.section_id, models.Section.course_semester, models.Section.university_name, models.Section.university_location, models.Section.course_code, models.Section.section_number).\
+                  join(models.RegisteredWith).\
+                  join(models.Course, and_(models.Section.course_code==models.Course.course_code, models.Section.course_semester==models.Course.course_semester, models.Section.university_name==models.Course.university_name, models.Section.university_location==models.Course.university_location)).\
+                  filter(models.RegisteredWith.u_id == currentuser.u_id).all()
+        return render_template('user.html', user=currentuser, isStudent=isStudent, groups=groups, classes=classes)
     else:
         return redirect('/')
 
