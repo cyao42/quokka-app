@@ -93,13 +93,20 @@ def register_class():
 
 @app.route('/register-user/', methods=['GET', 'POST'])
 def register_user():
+    global currentuser
     form = forms.UserRegisterFormFactory.form()
     if form.validate_on_submit():
         try:
             form.errors.pop('database', None)
-            models.Users.addNew(form.name.data, form.phone.data,
-                                form.email.data, form.user_type.data)
-            return redirect('/')
+            email_check = db.session.query(models.Users)\
+                          .filter(models.Users.email == form.email.data).first()
+            if(email_check):
+                return render_template('register.html', form=form, msg="User with that email already exists")
+            else:
+                models.Users.addNew(form.name.data, form.phone.data, form.email.data, form.user_type.data, form.password\
+.data)
+                currentuser = db.session.query(models.Users).filter(models.Users.email == form.email.data).first()
+                return redirect('/profile')
         except BaseException as e:
             form.errors['database'] = str(e)
             return render_template('register.html', form=form)
