@@ -4,7 +4,7 @@
 <form action="/register-class" method="POST">
   {{form.csrf_token}}
   <p>
-    Class Code: {{form.section_code}}
+    Code For Your Section: {{form.section_code}}
     {% if form.section_code.errors %}
     <ul>{% for error in form.section_code.errors %}><li>{{error}}</li>{% endfor %}</ul>
     {% endif %}
@@ -13,4 +13,5 @@
   <input type="submit" value="Submit"/>
   {% if 'database' in form.errors %}<p>{{form.errors['database']}}</p>{% endif %}
 </form>
+<h2>If you don't know, ask your professor!</h2>
 {% endblock %}

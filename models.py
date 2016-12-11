@@ -1,4 +1,4 @@
-from sqlalchemy import sql, orm
+from sqlalchemy import sql, orm, join
 from sqlalchemy.sql import text 
 from app import db
 
@@ -84,6 +84,17 @@ class University(db.Model):
     university_name = db.Column('university_name', db.String(256), primary_key=True)
     university_location = db.Column('university_location', db.String(256), primary_key=True)
 
+class Post(db.Model):
+    __tablename__ = 'post'
+    assignment_id = db.Column('assignment_id', db.Integer(), db.ForeignKey('projectassignment.assignment_id'), primary_key=True) 
+    time_posted = db.Column('time_posted', db.String(), primary_key=True)
+    message = db.Column('message', db.String(1000))
+
+class AssignedTo(db.Model):
+    __tablename__ = 'assignedto'
+    assignment_id = db.Column('assignment_id', db.String(256), db.ForeignKey('projectassignment.assignment_id'), primary_key=True)
+    section_id = db.Column('section_id', db.Integer(), db.ForeignKey('section.section_id'), primary_key=True)      
+
 class Course(db.Model):
     __tablename__ = 'course'
     course_code = db.Column('course_code', db.String(256), primary_key=True)
@@ -92,7 +103,6 @@ class Course(db.Model):
     university_location = db.Column('university_location', db.String(256), db.ForeignKey('university.university_location'), primary_key=True)
     course_name = db.Column('course_name', db.String(256))
     course_pre = db.Column('course_pre', db.String(256))
-
 
 class Section(db.Model):
     __tablename__ = 'section'
@@ -157,18 +167,6 @@ class ProjectAssignment(db.Model):
         except Exception as e:
             db.session.rollback()
             raise e
-
-class AssignedTo(db.Model):
-    __tablename__ = 'assignedto'
-    assignment_id = db.Column('assignment_id', db.String(256), db.ForeignKey('projectassignment.assignment_id'), primary_key=True)
-    section_id = db.Column('section_id', db.Integer(), db.ForeignKey('section.section_id'), primary_key=True)
-    assignments = orm.relationship('ProjectAssignment')     
-
-class Post(db.Model):
-    __tablename__ = 'post'
-    assignment_id = db.Column('assignment_id', db.Integer(), db.ForeignKey('projectassignment.assignment_id'), primary_key=True) 
-    time_posted = db.Column('time_posted', db.String(), primary_key=True)
-    message = db.Column('message', db.String(1000))
 
 class NeedTeamPost(db.Model):
     __tablename__ = 'needteampost'

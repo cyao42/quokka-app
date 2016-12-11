@@ -2,8 +2,8 @@ body { background-color: Lavender;
 }
 
 h1 {
-        color: WhiteSmoke;
-        font-size: 36px;
+        color: DarkSlateBlue;
+        font-size: 50px;
         font-family: Cooper Black;
         font-weight: bold;
         text-align: center;
@@ -15,6 +15,20 @@ h1 {
         padding: 10px 10px 10px 10px;
         border-radius: 10px 10px 10px 10px;
         border:3px outset WhiteSmoke;
+}
+
+.listings{
+	display: inline-flex;
+}
+
+.course{
+	margin-bottom: 20px; 
+	background-color: cadetblue;
+}
+
+.group{
+	margin-bottom: 20px;
+	background-color: goldenrod;
 }
 
 #groups {
