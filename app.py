@@ -23,8 +23,6 @@ def login_user():
                             .filter(models.Student.email == form.email.data).first()
             if user:
                 isStudent = True
-                print "flksdajflaksjflsda"
-                print isStudent
                 if user.password == form.password.data:
                     currentuser = user
                     form.errors.pop('database', None)
