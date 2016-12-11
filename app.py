@@ -156,11 +156,7 @@ def new_assignment():
         print "VALIDATED!!!"
         try:
             form.errors.pop('database', None)
-            selected = form.get_sections()
-            for s in selected:
-                print "SECTION:"
-                print s
-            #add assignment to database
+            models.ProjectAssignment.addNew(form.get_sections(), form.max_members.data, form.date_assigned.data, form.date_due.data, form.description.data)
             return redirect('/profile')
         except BaseException as e:
             form.errors['database'] = str(e)

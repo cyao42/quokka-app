@@ -117,7 +117,6 @@ class RegisteredWith(db.Model):
             db.session.rollback()
             raise e
 
-
 class Add(db.Model):
     __tablename__ = 'join'
     j_id = db.Column('j_id', db.Integer(), primary_key=True)
@@ -145,6 +144,19 @@ class ProjectAssignment(db.Model):
     date_due = db.Column('date_due', db.String(20))
     description = db.Column('description', db.String(1000))
     posts = orm.relationship('Post')
+    @staticmethod
+    def addNew(sections, max_mem, assigned, due, desc):
+        try:
+            a_id = db.session.query(ProjectAssignment).count()+1
+            db.session.execute('INSERT INTO projectassignment VALUES(:assignment_id, :max_members, :date_assigned, :date_due, :description)',
+            dict(assignment_id=a_id, max_members=max_mem, date_assigned=assigned, date_due=due, description=desc))
+            for section in sections:
+                db.session.execute('INSERT INTO assignedto VALUES(:assignment_id, :section_id)',
+                                   dict(assignment_id=a_id, section_id=int(section)))
+            db.session.commit()
+        except Exception as e:
+            db.session.rollback()
+            raise e
 
 class AssignedTo(db.Model):
     __tablename__ = 'assignedto'
