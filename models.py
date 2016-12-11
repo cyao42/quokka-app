@@ -93,7 +93,6 @@ class Course(db.Model):
     course_name = db.Column('course_name', db.String(256))
     course_pre = db.Column('course_pre', db.String(256))
 
-
 class Section(db.Model):
     __tablename__ = 'section'
     section_id = db.Column('section_id', db.Integer(), primary_key=True)
