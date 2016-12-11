@@ -1,4 +1,4 @@
-from flask import Flask, render_template, redirect, url_for, request
+from flask import Flask, render_template, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import and_
 import models
@@ -48,8 +48,8 @@ def login_user():
     else:
         return render_template('login.html', form=form, user=currentuser)
 
-@app.route('/new-group', methods=['GET', 'POST'])
-def new_group():
+@app.route('/<sectionid>/new-group', methods=['GET', 'POST'])
+def new_group(sectionid):
     global currentuser
     if not currentuser:
         return redirect('/')
@@ -61,16 +61,13 @@ def new_group():
     if form.validate_on_submit():
         try:
             form.errors.pop('database', None)
-            models.SchoolGroup.addNew(form.name.data, form.course.data, currentuser)
-            # if form.assignment:
-            #     models.ProjectGroup.addNew(form.name, form.course, form.assignment)
-            # else:
-            return redirect('/')
+            models.Groups.addNew(form.name.data, sectionid, form.assign.data, currentuser)
+            return redirect('/profile')
         except BaseException as e:
             form.errors['database'] = str(e)
-            return render_template('register.html', form=forms.UserLoginFormFactory.form())
+            return render_template('new-group.html', form=form, sectionid=sectionid)
     else:
-        return render_template('register.html', form=forms.UserLoginFormFactory.form())
+        return render_template('new-group.html', form=form, sectionid=sectionid)
 
 @app.route('/profile')
 def user():
@@ -132,22 +129,15 @@ def register_user():
     else:
         return render_template('register.html', form=form)
 
-@app.route('/feed/<id>')
+@app.route('/classfeed/<id>')
 def classfeed(id):
-    section = db.session.query(models.Section)\
-        .filter(models.Section.section_id == id).one()
-    course_code = section.course_code
-    assignments = db.session.query(models.ProjectAssignment)\
-                    .join(models.AssignedTo)\
-                    .join(models.Section)\
-                    .filter(models.Section.section_id == id)
-    return render_template('classfeed.html', section = section, assignments = assignments)
+    course = db.session.query(models.Course)\
+       .filter(models.Class.id == id).one()
+    #assignments = models.Course.getAssignments(course.course_code)
+    
+    return render_template('classfeed.html', course=course)
 
-@app.route('/classfeed/', methods=['GET', 'POST'])
-def getPosts(): 
-    assignment_id = request.form.get('selected_assignment')
-    assignment = db.session.query(models.ProjectAssignment)\
-        .filter(models.ProjectAssignment.assignment_id == assignment_id).one()
+def getPosts(assignment): 
     posts = assignment.posts
     return render_template('classfeed-posts.html', posts=posts, assignment=assignment)
 
