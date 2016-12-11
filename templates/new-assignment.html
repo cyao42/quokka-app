@@ -1,0 +1,21 @@
+{% extends 'layout.html' %}
+{% block heading %}New Assignment: {% endblock %}
+{% block content %}
+<form action="/register-class" method="POST">
+  {{form.csrf_token}}
+  <p>What sections do you want to assign this to?</p>
+  {% for s_name, field in form.section_fields() %}
+  <ul>
+    <li>{{s_name}}: {{field}}</li>
+  </ul>
+  {% endfor %}
+  <p>Max Members: {{form.max_members}}</p>
+  <p>Date Assigned: {{form.date_assigned}}</p>
+  <p>Date Due: {{form.date_due}}</p>
+  <p>Description: {{form.description}}</p>
+
+  <p>{% if msg %}{{msg}}{% endif %}</p>
+  <input type="submit" value="Submit"/>
+  {% if 'database' in form.errors %}<p>{{form.errors['database']}}</p>{% endif %}
+</form>
+{% endblock %}

@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, BooleanField, IntegerField, SelectField, PasswordField
+from wtforms import StringField, BooleanField, IntegerField, SelectField, PasswordField, SelectMultipleField, DateTimeField, TextAreaField
 from wtforms.validators import DataRequired, Length, Required, EqualTo
 
 
@@ -39,3 +39,25 @@ class ClassRegisterFormFactory:
         class F(FlaskForm):
             section_code = StringField(default='')
         return F()
+
+class AssignmentNewFormFactory:
+    @staticmethod
+    def form(sections):
+        class F(FlaskForm):
+            @staticmethod
+            def section_field_name(id):
+                return 'section_{}'.format(id)
+            def section_fields(self):
+                for s in sections:
+                    yield str(s.section_number)+" "+s.course_code, getattr(self, F.section_field_name(s.section_id))
+            assigned_to = SelectMultipleField(choices=[(section.section_id, section.course_code) for section in sections])
+            max_members = IntegerField()
+            date_assigned = StringField()
+            date_due = StringField()
+            description = TextAreaField()
+        for s in sections:
+            field_name = F.section_field_name(s.section_id)
+            default = None
+            setattr(F, field_name, BooleanField(default=default))
+        return F()
+
