@@ -49,8 +49,11 @@ class AssignmentNewFormFactory:
                 return 'section_{}'.format(id)
             def section_fields(self):
                 for s in sections:
-                    yield str(s.section_number)+" "+s.course_code, getattr(self, F.section_field_name(s.section_id))
-            assigned_to = SelectMultipleField(choices=[(section.section_id, section.course_code) for section in sections])
+                    yield s.section_id, str(s.section_number)+" "+s.course_code, getattr(self, F.section_field_name(s.section_id))
+            def get_sections(self):
+                for s_id, s_name, s_field in self.section_fields():
+                    if s_field.data:
+                        yield s_id
             max_members = IntegerField()
             date_assigned = StringField()
             date_due = StringField()

@@ -1,10 +1,10 @@
 {% extends 'layout.html' %}
 {% block heading %}New Assignment: {% endblock %}
 {% block content %}
-<form action="/register-class" method="POST">
+<form action="/new-assignment" method="POST">
   {{form.csrf_token}}
   <p>What sections do you want to assign this to?</p>
-  {% for s_name, field in form.section_fields() %}
+  {% for s_id, s_name, field in form.section_fields() %}
   <ul>
     <li>{{s_name}}: {{field}}</li>
   </ul>
