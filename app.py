@@ -1,5 +1,6 @@
-from flask import Flask, render_template, redirect, url_for
+from flask import Flask, render_template, redirect, url_for, request
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import and_
 import models
 import forms
 
@@ -12,13 +13,16 @@ currentuser = None
 @app.route('/', methods=['GET', 'POST'])
 def login_user():
     global currentuser
+    global isStudent
     form = forms.UserLoginFormFactory.form()
     user = currentuser
     if form.validate_on_submit():
         try:
-            user = db.session.query(models.Users)\
-                            .filter(models.Users.email == form.email.data).first()
+            isStudent = True
+            user = db.session.query(models.Student)\
+                            .filter(models.Student.email == form.email.data).first()
             if user:
+                isStudent = True
                 if user.password == form.password.data:
                     currentuser = user
                     form.errors.pop('database', None)
@@ -26,15 +30,26 @@ def login_user():
                 else:
                     return render_template('login.html', form=form, user=None, msg="Incorrect password!")
             else:
-                return render_template('login.html', form=form, user=None, msg="No user with that email")
+                user = db.session.query(models.Professor)\
+                            .filter(models.Professor.email == form.email.data).first()
+                if user:
+                    isStudent = False
+                    if user.password == form.password.data:
+                        currentuser = user
+                        form.errors.pop('database', None)
+                        return redirect('/profile')
+                    else:
+                        return render_template('login.html', form=form, user=None, msg="Incorrect password!")
+                else:
+                    return render_template('login.html', form=form, user=None, msg="No user with that email")
         except BaseException as e:
             form.errors['database'] = str(e)
             return render_template('login.html', form=form, user=currentuser)
     else:
         return render_template('login.html', form=form, user=currentuser)
 
-@app.route('/<sectionid>/new-group', methods=['GET', 'POST'])
-def new_group(sectionid):
+@app.route('/new-group', methods=['GET', 'POST'])
+def new_group():
     global currentuser
     if not currentuser:
         return redirect('/')
@@ -46,13 +61,16 @@ def new_group(sectionid):
     if form.validate_on_submit():
         try:
             form.errors.pop('database', None)
-            models.Groups.addNew(form.name.data, sectionid, form.assign.data, currentuser)
-            return redirect('/profile')
+            models.SchoolGroup.addNew(form.name.data, form.course.data, currentuser)
+            # if form.assignment:
+            #     models.ProjectGroup.addNew(form.name, form.course, form.assignment)
+            # else:
+            return redirect('/')
         except BaseException as e:
             form.errors['database'] = str(e)
-            return render_template('new-group.html', form=form, sectionid=sectionid)
+            return render_template('register.html', form=forms.UserLoginFormFactory.form())
     else:
-        return render_template('new-group.html', form=form, sectionid=sectionid)
+        return render_template('register.html', form=forms.UserLoginFormFactory.form())
 
 @app.route('/profile')
 def user():
@@ -61,10 +79,11 @@ def user():
         groups = db.session.query(models.Groups).\
                  join(models.MemberOf).\
                  filter(models.MemberOf.u_id == currentuser.u_id).all()
-        classes = db.session.query(models.Section)\
-                  .join(models.RegisteredWith)\
-                 .filter(models.RegisteredWith.u_id == currentuser.u_id).all()
-        return render_template('user.html', user=currentuser, groups=groups, classes=classes)
+        classes = db.session.query(models.Section, models.Course.course_name, models.Course.course_pre, models.Section.section_id, models.Section.course_semester, models.Section.university_name, models.Section.university_location, models.Section.course_code, models.Section.section_number).\
+                  join(models.RegisteredWith).\
+                  join(models.Course, and_(models.Section.course_code==models.Course.course_code, models.Section.course_semester==models.Course.course_semester, models.Section.university_name==models.Course.university_name, models.Section.university_location==models.Course.university_location)).\
+                  filter(models.RegisteredWith.u_id == currentuser.u_id).all()
+        return render_template('user.html', user=currentuser, isStudent=isStudent, groups=groups, classes=classes)
     else:
         return redirect('/')
 
@@ -113,15 +132,22 @@ def register_user():
     else:
         return render_template('register.html', form=form)
 
-@app.route('/classfeed/<id>')
+@app.route('/feed/<id>')
 def classfeed(id):
-    course = db.session.query(models.Course)\
-       .filter(models.Class.id == id).one()
-    #assignments = models.Course.getAssignments(course.course_code)
-    
-    return render_template('classfeed.html', course=course)
+    section = db.session.query(models.Section)\
+        .filter(models.Section.section_id == id).one()
+    course_code = section.course_code
+    assignments = db.session.query(models.ProjectAssignment)\
+                    .join(models.AssignedTo)\
+                    .join(models.Section)\
+                    .filter(models.Section.section_id == id)
+    return render_template('classfeed.html', section = section, assignments = assignments)
 
-def getPosts(assignment): 
+@app.route('/classfeed/', methods=['GET', 'POST'])
+def getPosts(): 
+    assignment_id = request.form.get('selected_assignment')
+    assignment = db.session.query(models.ProjectAssignment)\
+        .filter(models.ProjectAssignment.assignment_id == assignment_id).one()
     posts = assignment.posts
     return render_template('classfeed-posts.html', posts=posts, assignment=assignment)
 
