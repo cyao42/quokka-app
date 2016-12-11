@@ -125,9 +125,9 @@ def register_user():
 @app.route('/classfeed/<id>')
 def classfeed(id):
     course = db.session.query(models.Course)\
-       .filter(models.Class.id == id).one()
-    assignments = models.Course.getAssignments(course.course_code) 
-    return render_template('classfeed.html', course=course)
+       .filter(models.Course.course_code == id).first()
+    #assignments = models.Course.getAssignments(course.course_code) 
+    return render_template('classfeed-posts.html', course=classThing)
 
 def getPosts(assignment): 
     posts = assignment.posts
@@ -146,7 +146,9 @@ def membersOf(g_id):
     member = db.session.query(models.Student)\
        .join(models.MemberOf, (models.Student.u_id == models.MemberOf.u_id))\
        .filter(models.MemberOf.g_id == g_id).all()
-    return render_template('membersof.html', member=member)
+    group = db.session.query(models.Groups)\
+       .filter(models.Groups.g_id == g_id).first()
+    return render_template('membersof.html', member=member, group=group)
 
 @app.template_filter('pluralize')
 def pluralize(number, singular='', plural='s'):
