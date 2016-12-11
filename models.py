@@ -1,4 +1,4 @@
-Bfrom sqlalchemy import sql, orm, join
+from sqlalchemy import sql, orm, join
 from sqlalchemy.sql import text 
 from app import db
 
