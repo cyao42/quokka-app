@@ -123,6 +123,34 @@ def getPosts():
     posts = assignment.posts
     return render_template('classfeed-posts.html', posts=posts, assignment=assignment)
 
+@app.route('/new-assignment', methods=['GET', 'POST'])
+def new_assignment():
+    global currentuser
+    if not currentuser:
+        return redirect('/')
+
+    sections = db.session.query(models.Section)\
+            .join(models.RegisteredWith)\
+            .filter(models.RegisteredWith.u_id == currentuser.u_id)
+    form = forms.AssignmentNewFormFactory.form(sections)
+    print "IS FORM VALIDATED?"
+    if form.validate_on_submit():
+        print "VALIDATED!!!"
+        try:
+            form.errors.pop('database', None)
+            selected = form.get_sections()
+            for s in selected:
+                print "SECTION:"
+                print s
+            #add assignment to database
+            return redirect('/profile')
+        except BaseException as e:
+            form.errors['database'] = str(e)
+            return render_template('new-assignment.html', form=form)
+    else:
+        return render_template('new-assignment.html', form=form)
+
+
 @app.template_filter('pluralize')
 def pluralize(number, singular='', plural='s'):
     return singular if number in (0, 1) else plural
