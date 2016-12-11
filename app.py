@@ -1,4 +1,4 @@
-from flask import Flask, render_template, redirect, url_for
+from flask import Flask, render_template, redirect, url_for, request
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import and_
 import models
@@ -13,16 +13,16 @@ currentuser = None
 @app.route('/', methods=['GET', 'POST'])
 def login_user():
     global currentuser
-    global isProfessor
+    global isStudent
     form = forms.UserLoginFormFactory.form()
     user = currentuser
     if form.validate_on_submit():
         try:
-            isProfessor = False
+            isStudent = True
             user = db.session.query(models.Student)\
                             .filter(models.Student.email == form.email.data).first()
             if user:
-                isProfessor = False
+                isStudent = True
                 if user.password == form.password.data:
                     currentuser = user
                     form.errors.pop('database', None)
@@ -33,7 +33,7 @@ def login_user():
                 user = db.session.query(models.Professor)\
                             .filter(models.Professor.email == form.email.data).first()
                 if user:
-                    isProfessor = True
+                    isStudent = False
                     if user.password == form.password.data:
                         currentuser = user
                         form.errors.pop('database', None)
@@ -80,7 +80,7 @@ def user():
                   join(models.RegisteredWith).\
                   join(models.Course, and_(models.Section.course_code==models.Course.course_code, models.Section.course_semester==models.Course.course_semester, models.Section.university_name==models.Course.university_name, models.Section.university_location==models.Course.university_location)).\
                   filter(models.RegisteredWith.u_id == currentuser.u_id).all()
-        return render_template('user.html', user=currentuser, professor=isProfessor, groups=groups, classes=classes)
+        return render_template('user.html', user=currentuser, isStudent=isStudent, groups=groups, classes=classes)
     else:
         return redirect('/')
 
@@ -109,37 +109,44 @@ def register_class():
 
 @app.route('/register-user/', methods=['GET', 'POST'])
 def register_user():
+    global currentuser
     form = forms.UserRegisterFormFactory.form()
     if form.validate_on_submit():
         try:
             form.errors.pop('database', None)
-            models.Users.addNew(form.name.data, form.phone.data,
-                                form.email.data, form.user_type.data)
-            return redirect('/')
+            email_check = db.session.query(models.Users)\
+                          .filter(models.Users.email == form.email.data).first()
+            if(email_check):
+                return render_template('register.html', form=form, msg="User with that email already exists")
+            else:
+                models.Users.addNew(form.name.data, form.phone.data, form.email.data, form.user_type.data, form.password\
+.data)
+                currentuser = db.session.query(models.Users).filter(models.Users.email == form.email.data).first()
+                return redirect('/profile')
         except BaseException as e:
             form.errors['database'] = str(e)
             return render_template('register.html', form=form)
     else:
         return render_template('register.html', form=form)
 
-@app.route('/classfeed/<id>')
+@app.route('/feed/<id>')
 def classfeed(id):
-    course = db.session.query(models.Course)\
-       .filter(models.Course.course_code == id).first()
-    #assignments = models.Course.getAssignments(course.course_code) 
-    return render_template('classfeed-posts.html', course=classThing)
+    section = db.session.query(models.Section)\
+        .filter(models.Section.section_id == id).all()
+    course_code = section.course_code
+    assignments = db.session.query(models.ProjectAssignment)\
+                    .join(models.AssignedTo)\
+                    .join(models.Section)\
+                    .filter(models.Section.section_id == id)
+    return render_template('classfeed.html', section = section, assignments = assignments)
 
-def getPosts(assignment): 
+@app.route('/classfeed/', methods=['GET', 'POST'])
+def getPosts(): 
+    assignment_id = request.form.get('selected_assignment')
+    assignment = db.session.query(models.ProjectAssignment)\
+        .filter(models.ProjectAssignment.assignment_id == assignment_id).all()
     posts = assignment.posts
-    return render_template('classfeed-posts.html', posts=posts, assignment=assignment)
-
-@app.route('/mygroups/')
-def myGroups():
-    return render_template('mygroups.html')
-
-@app.route('/myclasses/')
-def myClasses():
-    return render_template('myclasses.html')
+    return render_template('classfeed.html', posts=posts, assignment=assignment)
 
 @app.route('/membersof/<g_id>')
 def membersOf(g_id):
