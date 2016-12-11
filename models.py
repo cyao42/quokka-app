@@ -90,15 +90,6 @@ class Post(db.Model):
     time_posted = db.Column('time_posted', db.String(), primary_key=True)
     message = db.Column('message', db.String(1000))
 
-class ProjectAssignment(db.Model):
-    __tablename__ = 'projectassignment'
-    assignment_id = db.Column('assignment_id', db.Integer(), primary_key=True)
-    max_members = db.Column('max_members', db.Integer())
-    date_assigned = db.Column('date_assigned', db.String(20))
-    date_due = db.Column('date_due', db.String(20))
-    description = db.Column('description', db.String(1000))
-    posts = orm.relationship('Post')
-
 class AssignedTo(db.Model):
     __tablename__ = 'assignedto'
     assignment_id = db.Column('assignment_id', db.String(256), db.ForeignKey('projectassignment.assignment_id'), primary_key=True)
@@ -153,7 +144,29 @@ class SentTo(db.Model):
 class SentBy(db.Model):
     __tablename__ = 'sentby'
     j_id = db.Column('j_id', db.Integer(), db.ForeignKey('join.j_id'), primary_key=True)    
-    u_id = db.Column('u_id', db.Integer(), db.ForeignKey('Users.u_id'), primary_key=True)     
+    u_id = db.Column('u_id', db.Integer(), db.ForeignKey('Users.u_id'), primary_key=True)    
+    
+class ProjectAssignment(db.Model):
+    __tablename__ = 'projectassignment'
+    assignment_id = db.Column('assignment_id', db.Integer(), primary_key=True)
+    max_members = db.Column('max_members', db.Integer())
+    date_assigned = db.Column('date_assigned', db.String(20))
+    date_due = db.Column('date_due', db.String(20))
+    description = db.Column('description', db.String(1000))
+    posts = orm.relationship('Post')
+    @staticmethod
+    def addNew(sections, max_mem, assigned, due, desc):
+        try:
+            a_id = db.session.query(ProjectAssignment).count()+1
+            db.session.execute('INSERT INTO projectassignment VALUES(:assignment_id, :max_members, :date_assigned, :date_due, :description)',
+            dict(assignment_id=a_id, max_members=max_mem, date_assigned=assigned, date_due=due, description=desc))
+            for section in sections:
+                db.session.execute('INSERT INTO assignedto VALUES(:assignment_id, :section_id)',
+                                   dict(assignment_id=a_id, section_id=int(section)))
+            db.session.commit()
+        except Exception as e:
+            db.session.rollback()
+            raise e
 
 class NeedTeamPost(db.Model):
     __tablename__ = 'needteampost'
