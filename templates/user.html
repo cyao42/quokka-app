@@ -1,8 +1,16 @@
 {% extends 'layout.html' %}
-{% block heading %}User Information: {{user.name}}{% endblock %}
+{% block heading %}My Information: {% endblock %}
 {% block content %}
 <p>Name: {{user.name}}</p>
+<p>Phone: {{user.phone}}</p>
+<p>E-mail: {{user.email}}</p>
+{% if isProfessor == false %}
+<p>First Major: {{user.first_major}}</p>
+<p>Second Major: {{user.second_major}}</p>
+<p>Graduation Year: {{user.grad_year}}</p>
+{% endif %}
 
+{% if isProfessor == false %}
 <h2>My Groups:</h2>
 {% if groups|length > 0 %}
 <ul>
@@ -11,17 +19,21 @@
 {% else %}
 <p>You are not in any groups!</p>
 {% endif %}
+{% endif %}
 
 <h2>My Classes:</h2>
 {% if classes|length > 0 %}
 <ul>
 {% for classThing in classes %}
-<li>{{classThing.course_code}} </li>
+<li>Class: {{classThing.course_pre}} {{classThing.course_code}} {{classThing.course_name}}</li>
+<p>Section: {{classThing.section_number}}</p>
+<p>Semester: {{classThing.course_semester}}</p>
+<p>@ {{classThing.university_name}}</p>
 <a href="{{url_for('new_group', sectionid=classThing.section_id)}}">Add Group</a>
 {% endfor %}
 </ul>
 {% else %}
-<p>You are not in any classes!</p>
+<p>You have not added any classes!</p>
 {% endif %}
 <p>Register for a class <a href="/register-class">here</a>!</p>
 {% endblock %}
