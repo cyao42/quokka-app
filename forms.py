@@ -30,3 +30,10 @@ class UserRegisterFormFactory:
             email = StringField(default='')
             user_type = SelectField('User Type', choices=[('pro', 'Professor'), ('stu', 'Student')])
         return F()
+
+class ClassRegisterFormFactory:
+    @staticmethod
+    def form():
+        class F(FlaskForm):
+            section_code = StringField(default='')
+        return F()
