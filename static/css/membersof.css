@@ -3,13 +3,21 @@ body { background-color: Lavender;
 
 h1 {
         color: DarkSlateBlue;
-        font-size: 36px;
+        font-size: 32px;
         font-family: Cooper Black;
         font-weight: bold;
-        text-align: center;
+        text-align: Center;
 }
 
-#groups {
+h3 {
+        color: DarkSlateBlue;
+        font-size: 16px;
+        font-family: Cooper Black;
+        font-weight: bold;
+        text-align: left;
+}
+
+section {
         background-color: WhiteSmoke;
         position: relative;
         padding: 10px 10px 10px 10px;
