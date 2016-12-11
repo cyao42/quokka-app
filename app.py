@@ -36,6 +36,9 @@ def login_user():
 @app.route('/<sectionid>/new-group', methods=['GET', 'POST'])
 def new_group(sectionid):
     global currentuser
+    if not currentuser:
+        return redirect('/')
+    
     assignments = db.session.query(models.ProjectAssignment)\
                       .join(models.AssignedTo)\
                       .filter(models.AssignedTo.section_id == sectionid)
@@ -53,6 +56,7 @@ def new_group(sectionid):
 
 @app.route('/profile')
 def user():
+    global currentuser
     if(currentuser):
         groups = db.session.query(models.Groups).\
                  join(models.MemberOf).\
@@ -64,23 +68,31 @@ def user():
     else:
         return redirect('/')
 
-@app.route('/create/study/<university>/<semester>/<code>', methods=['GET', 'POST'])
-def new_study_group(university, semester, code):
-    form = forms.StudyGroupCreateFormFactory.form()
+@app.route('/register-class', methods=['GET', 'POST'])
+def register_class():
+    global currentuser
+    if not currentuser:
+        return redirect('/')
+
+    form = forms.ClassRegisterFormFactory.form()
     if form.validate_on_submit():
         try:
             form.errors.pop('database', None)
-            models.Groups.addNew(form.group_name)
-            return redirect('/profile')
+            section = db.session.query(models.Section)\
+                      .filter(models.Section.section_id == form.section_code.data).first()
+            if section:
+                models.RegisteredWith.addNew(currentuser.u_id, section.section_id)
+                return redirect('/profile')
+            else:
+                return render_template('register-class.html', form=form, msg="No class found with that code!")
         except BaseException as e:
             form.errors['database'] = str(e)
-            return render_template('/create/study/<university>/<semester>/<code>')
+            return render_template('register-class.html', form=form)
     else:
-        return render_template('/create/study/<university>/<semester>/<code>')
+        return render_template('register-class.html', form=form)
 
-@app.route('/register/', methods=['GET', 'POST'])
-def register():
-    print("hit register")
+@app.route('/register-user/', methods=['GET', 'POST'])
+def register_user():
     form = forms.UserRegisterFormFactory.form()
     if form.validate_on_submit():
         try:
