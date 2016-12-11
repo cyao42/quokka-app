@@ -10,22 +10,21 @@
 <p>Graduation Year: {{user.grad_year}}</p>
 {% endif %}
 
-{% if isProfessor == false %}
+
 <h2>My Groups:</h2>
 {% if groups|length > 0 %}
 <ul>
-{% for group in groups %}<li>{{group.group_name}}</li>{% endfor %}
+{% for group in groups %}<li><a href="{{url_for('membersOf', g_id=group.g_id)}}">{{group.group_name}}</a></li>{% endfor %}
 </ul>
 {% else %}
 <p>You are not in any groups!</p>
-{% endif %}
 {% endif %}
 
 <h2>My Classes:</h2>
 {% if classes|length > 0 %}
 <ul>
 {% for classThing in classes %}
-<li>Class: {{classThing.course_pre}} {{classThing.course_code}} {{classThing.course_name}}</li>
+<li>Class:<a href="{{url_for('classfeed', id=classThing.course_code)}}">{{classThing.course_pre}} {{classThing.course_code}} {{classThing.course_name}}</a></li>
 <p>Section: {{classThing.section_number}}</p>
 <p>Semester: {{classThing.course_semester}}</p>
 <p>@ {{classThing.university_name}}</p>
