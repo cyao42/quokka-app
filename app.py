@@ -13,16 +13,18 @@ currentuser = None
 @app.route('/', methods=['GET', 'POST'])
 def login_user():
     global currentuser
-    global isProfessor
+    global isStudent
     form = forms.UserLoginFormFactory.form()
     user = currentuser
     if form.validate_on_submit():
         try:
-            isProfessor = False
+            isStudent = True
             user = db.session.query(models.Student)\
                             .filter(models.Student.email == form.email.data).first()
             if user:
-                isProfessor = False
+                isStudent = True
+                print "flksdajflaksjflsda"
+                print isStudent
                 if user.password == form.password.data:
                     currentuser = user
                     form.errors.pop('database', None)
@@ -33,7 +35,7 @@ def login_user():
                 user = db.session.query(models.Professor)\
                             .filter(models.Professor.email == form.email.data).first()
                 if user:
-                    isProfessor = True
+                    isStudent = False
                     if user.password == form.password.data:
                         currentuser = user
                         form.errors.pop('database', None)
@@ -80,7 +82,7 @@ def user():
                   join(models.RegisteredWith).\
                   join(models.Course, and_(models.Section.course_code==models.Course.course_code, models.Section.course_semester==models.Course.course_semester, models.Section.university_name==models.Course.university_name, models.Section.university_location==models.Course.university_location)).\
                   filter(models.RegisteredWith.u_id == currentuser.u_id).all()
-        return render_template('user.html', user=currentuser, professor=isProfessor, groups=groups, classes=classes)
+        return render_template('user.html', user=currentuser, isStudent=isStudent, groups=groups, classes=classes)
     else:
         return redirect('/')
 
