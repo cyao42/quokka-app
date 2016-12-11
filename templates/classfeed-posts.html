@@ -22,30 +22,12 @@
       </ul>
       </div>
       <br></br>
+      {% for post in posts %}
       <div id="post">
-        <h6>
-        12/8/16 9:34 PM
-        </h6>
-        <p>
-        Hey, I'm looking for a group.
-        </p>
-    </div>
-      <div id="post">
-        <h6>
-        12/8/16 9:36 PM
-        </h6>
-        <p>
-        We're looking for another member.
-        </p>
-    </div>
-      <div id="post">
-        <h6>
-        12/8/16 9:37 PM
-        </h6>
-        <p>
-        We need a topic.
-        </p>
-        </div>
+        <h6>{{post.time_posted}}</h6>
+        <p>{{post.message}}</p>
+      </div>
+      {% endfor %}
     </div>	
   </body>
 </html>

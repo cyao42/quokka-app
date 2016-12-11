@@ -1,4 +1,4 @@
-from sqlalchemy import sql, orm
+from sqlalchemy import sql, orm, join
 from sqlalchemy.sql import text 
 from app import db
 
@@ -84,6 +84,26 @@ class University(db.Model):
     university_name = db.Column('university_name', db.String(256), primary_key=True)
     university_location = db.Column('university_location', db.String(256), primary_key=True)
 
+class Post(db.Model):
+    __tablename__ = 'post'
+    assignment_id = db.Column('assignment_id', db.Integer(), db.ForeignKey('projectassignment.assignment_id'), primary_key=True) 
+    time_posted = db.Column('time_posted', db.String(), primary_key=True)
+    message = db.Column('message', db.String(1000))
+
+class ProjectAssignment(db.Model):
+    __tablename__ = 'projectassignment'
+    assignment_id = db.Column('assignment_id', db.Integer(), primary_key=True)
+    max_members = db.Column('max_members', db.Integer())
+    date_assigned = db.Column('date_assigned', db.String(20))
+    date_due = db.Column('date_due', db.String(20))
+    description = db.Column('description', db.String(1000))
+    posts = orm.relationship('Post')
+
+class AssignedTo(db.Model):
+    __tablename__ = 'assignedto'
+    assignment_id = db.Column('assignment_id', db.String(256), db.ForeignKey('projectassignment.assignment_id'), primary_key=True)
+    section_id = db.Column('section_id', db.Integer(), db.ForeignKey('section.section_id'), primary_key=True)      
+
 class Course(db.Model):
     __tablename__ = 'course'
     course_code = db.Column('course_code', db.String(256), primary_key=True)
@@ -93,15 +113,14 @@ class Course(db.Model):
     course_name = db.Column('course_name', db.String(256))
     course_pre = db.Column('course_pre', db.String(256))
 
-
 class Section(db.Model):
     __tablename__ = 'section'
     section_id = db.Column('section_id', db.Integer(), primary_key=True)
     section_number = db.Column('section_number', db.Integer())
-    course_code = db.Column('course_code', db.String(256), db.ForeignKey('course.course_code'))
-    course_semester = db.Column('course_semester', db.String(256), db.ForeignKey('course.course_semester'))
-    university_name = db.Column('university_name', db.String(256), db.ForeignKey('university.university_name'))
-    university_location = db.Column('university_location', db.String(256), db.ForeignKey('university.university_location'))
+    course_code = db.Column('course_code', db.String(256), db.ForeignKey('course.course_code'), primary_key=True)
+    course_semester = db.Column('course_semester', db.String(256), db.ForeignKey('course.course_semester'), primary_key=True)
+    university_name = db.Column('university_name', db.String(256), db.ForeignKey('university.university_name'), primary_key=True)
+    university_location = db.Column('university_location', db.String(256), db.ForeignKey('university.university_location'), primary_key=True)
 
 class RegisteredWith(db.Model):
     __tablename__ = 'registeredwith'
@@ -116,7 +135,6 @@ class RegisteredWith(db.Model):
         except Exception as e:
             db.session.rollback()
             raise e
-
 
 class Add(db.Model):
     __tablename__ = 'join'
@@ -135,28 +153,7 @@ class SentTo(db.Model):
 class SentBy(db.Model):
     __tablename__ = 'sentby'
     j_id = db.Column('j_id', db.Integer(), db.ForeignKey('join.j_id'), primary_key=True)    
-    u_id = db.Column('u_id', db.Integer(), db.ForeignKey('Users.u_id'), primary_key=True)    
-    
-class ProjectAssignment(db.Model):
-    __tablename__ = 'projectassignment'
-    assignment_id = db.Column('assignment_id', db.Integer(), primary_key=True)
-    max_members = db.Column('max_members', db.Integer())
-    date_assigned = db.Column('date_assigned', db.String(20))
-    date_due = db.Column('date_due', db.String(20))
-    description = db.Column('description', db.String(1000))
-    posts = orm.relationship('Post')
-
-class AssignedTo(db.Model):
-    __tablename__ = 'assignedto'
-    assignment_id = db.Column('assignment_id', db.String(256), db.ForeignKey('projectassignment.assignment_id'), primary_key=True)
-    section_id = db.Column('section_id', db.Integer(), db.ForeignKey('section.section_id'), primary_key=True)
-    assignments = orm.relationship('ProjectAssignment')     
-
-class Post(db.Model):
-    __tablename__ = 'post'
-    assignment_id = db.Column('assignment_id', db.Integer(), db.ForeignKey('projectassignment.assignment_id'), primary_key=True) 
-    time_posted = db.Column('time_posted', db.String(), primary_key=True)
-    message = db.Column('message', db.String(1000))
+    u_id = db.Column('u_id', db.Integer(), db.ForeignKey('Users.u_id'), primary_key=True)     
 
 class NeedTeamPost(db.Model):
     __tablename__ = 'needteampost'
