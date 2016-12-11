@@ -117,10 +117,10 @@ class Section(db.Model):
     __tablename__ = 'section'
     section_id = db.Column('section_id', db.Integer(), primary_key=True)
     section_number = db.Column('section_number', db.Integer())
-    course_code = db.Column('course_code', db.String(256), db.ForeignKey('course.course_code'), primary_key=True)
-    course_semester = db.Column('course_semester', db.String(256), db.ForeignKey('course.course_semester'), primary_key=True)
-    university_name = db.Column('university_name', db.String(256), db.ForeignKey('university.university_name'), primary_key=True)
-    university_location = db.Column('university_location', db.String(256), db.ForeignKey('university.university_location'), primary_key=True)
+    course_code = db.Column('course_code', db.String(256), db.ForeignKey('course.course_code'))
+    course_semester = db.Column('course_semester', db.String(256), db.ForeignKey('course.course_semester'))
+    university_name = db.Column('university_name', db.String(256), db.ForeignKey('university.university_name'))
+    university_location = db.Column('university_location', db.String(256), db.ForeignKey('university.university_location'))
 
 class RegisteredWith(db.Model):
     __tablename__ = 'registeredwith'
