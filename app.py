@@ -180,20 +180,21 @@ def register_user():
 def classfeed(id):
     section = db.session.query(models.Section)\
         .filter(models.Section.section_id == id).one()
-    course_code = section.course_code
+    course = db.session.query(models.Course)\
+                    .filter(models.Course.course_code == section.course_code).one()
     assignments = db.session.query(models.ProjectAssignment)\
                     .join(models.AssignedTo)\
                     .join(models.Section)\
-                    .filter(models.Section.section_id == id)
-    return render_template('classfeed.html', section = section, assignments = assignments)
+                    .filter(models.Section.section_id == id).all()
+    return render_template('classfeed.html', section = section, course = course, assignments = assignments)
 
-@app.route('/classfeed/', methods=['GET', 'POST'])
-def getPosts(): 
+@app.route('/classfeed/<course_name>/<section_number>', methods=['GET', 'POST'])
+def getPosts(course_name, section_number): 
     assignment_id = request.form.get('selected_assignment')
     assignment = db.session.query(models.ProjectAssignment)\
         .filter(models.ProjectAssignment.assignment_id == assignment_id).one()
     posts = assignment.posts
-    return render_template('classfeed-posts.html', posts=posts, assignment=assignment)
+    return render_template('classfeed-posts.html', posts=posts, assignment=assignment, course_name = course_name, section_number = section_number)
 
 @app.route('/new-assignment', methods=['GET', 'POST'])
 def new_assignment():
