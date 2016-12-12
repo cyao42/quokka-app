@@ -1,0 +1,23 @@
+{% extends 'layout.html' %}
+{% block heading %}New Class Information: {% endblock %}
+{% block content %}
+<form action="/create-university" method="POST">
+  {{form.csrf_token}}
+  <p>
+    Enter New University Name: {{form.u_name}}
+    {% if form.u_name.errors %}
+    <ul>{% for error in form.u_name.errors %}<li>{{error}}</li>{% endfor %}</ul>
+    {% endif %}
+  </p>
+  <p>
+    Enter New University Locations: {{form.u_loc}}
+    {% if form.u_loc.errors %}
+    <ul>{% for error in form.u_loc.errors %}<li>{{error}}</li>{% endfor %}</ul>
+    {% endif %}
+  </p>
+  <hr/>
+  <input type="reset" value="Reset"/>
+  <input type="submit" value="Submit"/>
+  {% if 'database' in form.errors %}<p>{{form.errors['database']}}</p>{% endif %}
+</form>
+{% endblock %}

@@ -38,7 +38,7 @@ CREATE TABLE MemberOf
 );
 
 CREATE TABLE University
-(university_name VARCHAR(265) NOT NULL,
+(university_name VARCHAR(265) NOT NULL UNIQUE,
  university_location VARCHAR(265) NOT NULL,
  PRIMARY KEY (university_name, university_location)
 );
@@ -129,16 +129,3 @@ CREATE TABLE StudyingFor
  FOREIGN KEY (section_id)
  REFERENCES Section(section_id)
 );
-
---List the names and groups of all leaders.--
-
-SELECT Users.name, group_name FROM Users, Groups, MemberOf
-WHERE MemberOf.u_id = Users.u_id AND MemberOf.g_id = Groups.g_id AND MemberOf.is_leader = 'yes';
-
---List names of all users who have posted that they need a team, but are now part of a group.--
-
-SELECT Users.name FROM Users NATURAL JOIN NeedTeamPost NATURAL JOIN MemberOf NATURAL JOIN Groups;
-
---List the names of all users who are not part of a group.--
-
-SELECT Users.name FROM Users EXCEPT (SELECT Users.name FROM Users NATURAL JOIN MemberOf NATURAL JOIN Groups);
