@@ -68,7 +68,7 @@ class PostNewFormFactory:
     def form():
         class F(FlaskForm):
             message = TextAreaField('Message')
-            options = [('team','looking for team'),('member','looking for memeber')]
+            options = [('need_team','looking for team'),('need_member','looking for member')]
             looking_for = SelectField('Looking For', choices=options)
         return F()
 

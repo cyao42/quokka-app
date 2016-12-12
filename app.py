@@ -3,6 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import and_
 import models
 import forms
+import datetime
 
 app = Flask(__name__)
 app.secret_key = 's3cr3t'
@@ -84,22 +85,25 @@ def user():
     else:
         return redirect('/')
 
-@app.route('/create-post')
-def createpost():
+@app.route('/create-post/<assignment_id>/<course_code>/<section_number>', methods=['GET', 'POST'])
+def createPost(assignment_id, course_code, section_number):
     global currentuser
     if not currentuser:
         return redirect('/')
-
+    section = db.session.query(models.Section)\
+                .filter(models.Section.section_course_code==course_code, models.Section.section_number==section_number).one()
     form = forms.PostNewFormFactory.form()
     if form.validate_on_submit():
         try:
             form.errors.pop('database', None)
-            return redirect('/profile')
+            time = str(datetime.datetime.now())
+            models.Post.addNew(assignment_id, section.section_id, currentuser.u_id, form.looking_for.data, form.message.data,time)
+            return redirect(url_for('getAllPosts', course_code=section.course_code, section_number=section_number, assignment_id = assignment_id))
         except BaseException as e:
             form.errors['database'] = str(e)
-            return render_template('new-post.html', form=form)
+            return render_template('new-post.html', form=form, assignment_id=assignment_id, course_code=course_code,section_number=section_number)
     else:
-        return render_template('new-post.html', form=form)
+        return render_template('new-post.html', form=form, assignment_id=assignment_id, course_code=course_code,section_number=section_number)
 
 @app.route('/register-class', methods=['GET', 'POST'])
 def register_class():

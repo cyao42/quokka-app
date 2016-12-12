@@ -11,7 +11,7 @@
       <p>{{assignment.description}}</p>
     <ul id="top">
     <li class="filter">Filter</li>
-    <li class="post">AddPost</li>
+    <li class="post"><a href="{{url_for('createPost', assignment_id = assignment.assignment_id, course_code=course.course_code, section_number=section_number)}}" method="POST">Add a post</a></li>
     </ul>
     </div>
     <br></br>

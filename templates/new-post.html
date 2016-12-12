@@ -4,7 +4,7 @@
 <head>
   <link type="text/css" rel="stylesheet" href="/static/css/style.css"/>
 </head>
-<form action="/create-post" method="POST">
+<form action="{{url_for('createPost', assignment_id=assignment_id, section_id=section_id)}}" method="POST">
   {{form.csrf_token}}
   <p>
     Write a message: {{form.message(cols="35",rows="20")}}
