@@ -91,7 +91,7 @@ def createPost(assignment_id, course_code, section_number):
     if not currentuser:
         return redirect('/')
     section = db.session.query(models.Section)\
-                .filter(models.Section.section_course_code==course_code, models.Section.section_number==section_number).one()
+                .filter(models.Section.course_code==course_code, models.Section.section_number==section_number).one()
     form = forms.PostNewFormFactory.form()
     if form.validate_on_submit():
         try:
