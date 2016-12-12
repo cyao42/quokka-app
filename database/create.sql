@@ -143,7 +143,8 @@ CREATE TABLE GroupResponse
  g_id INTEGER NOT NULL PRIMARY KEY REFERENCES Groups(g_id),
  section_id INTEGER NOT NULL PRIMARY KEY REFERENCES Section(section_id),
  time_posted INTEGER NOT NULL,
- message VARCHAR(1000)
+ message VARCHAR(1000),
+ approved BOOLEAN NOT NULL
 );
 
 CREATE TABLE UserResponse
@@ -151,5 +152,6 @@ CREATE TABLE UserResponse
  u_id INTEGER NOT NULL PRIMARY KEY REFERENCES Groups(g_id),
  section_id INTEGER NOT NULL PRIMARY KEY REFERENCES Section(section_id),
  time_posted INTEGER NOT NULL,
- message VARCHAR(1000)
+ message VARCHAR(1000),
+ approved BOOLEAN NOT NULL
 );

@@ -205,6 +205,7 @@ class GroupResponse(db.Model):
     section_id = db.Column('section_id', db.Integer(), db.ForeignKey('section.section_id'), primary_key=True)
     time_posted = db.Column('time_posted', db.Integer())
     message = db.Column('message', db.String(1000))
+    approved = db.Column('approved', db.Boolean())
 
 class UserResponse(db.Model):
     __tablename__ = 'groupresponse'
@@ -213,3 +214,4 @@ class UserResponse(db.Model):
     section_id = db.Column('section_id', db.Integer(), db.ForeignKey('section.section_id'), primary_key=True)
     time_posted = db.Column('time_posted', db.Integer())
     message = db.Column('message', db.String(1000))
+    approved = db.Column('approved', db.Boolean())
