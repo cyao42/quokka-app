@@ -137,7 +137,7 @@ CREATE TABLE GroupResponse
  time_posted VARCHAR(100) NOT NULL,
  message VARCHAR(1000),
  approved BOOLEAN NOT NULL,
- PRIMARY KEY (post_id, g_id, section_id)
+ PRIMARY KEY (post_id, g_id)
 );
 
 CREATE TABLE UserResponse
@@ -147,5 +147,5 @@ CREATE TABLE UserResponse
  time_posted VARCHAR(100) NOT NULL,
  message VARCHAR(1000),
  approved BOOLEAN NOT NULL,
- PRIMARY KEY (post_id, u_id, section_id)
+ PRIMARY KEY (post_id, u_id)
 );

@@ -273,33 +273,35 @@ def membersOf(g_id):
             .filter(models.Groups.g_id == g_id).first()
     return render_template('membersof.html', member=member, group=group)
 
-@app.route('/my_inbox/')
+@app.route('/my_inbox', methods=['GET', 'POST'])
 def inbox():
-    user_responses = db.session.query(models.UserResponse, models.ProjectAssignment.description, models.Users.name, models.UserResponse.message)\
+    user_responses = db.session.query(models.UserResponse, models.ProjectAssignment.description, models.Users.name, models.UserResponse.u_id, models.UserResponse.post_id, models.UserResponse.message, models.UserResponse.time_posted, models.Post.assignment_id, models.Post.section_id)\
                      .join(models.Post)\
                      .join(models.Users, models.Users.u_id == models.UserResponse.u_id)\
                      .join(models.ProjectAssignment)\
                      .filter(models.Post.post_type == 'need_team' and models.Post.u_id == currentuser.u_id).all()\
  
-    group_responses = db.session.query(models.GroupResponse, models.ProjectAssignment.description, models.Groups.group_name, models.GroupResponse.message)\
+    group_responses = db.session.query(models.GroupResponse, models.ProjectAssignment.description, models.Groups.group_name, models.GroupResponse.g_id, models.GroupResponse.post_id, models.GroupResponse.message, models.GroupResponse.time_posted)\
                       .join(models.Post)\
                       .join(models.Groups)\
                       .join(models.ProjectAssignment)\
                       .filter(models.Post.post_id == models.GroupResponse.post_id and models.Post.post_type == 'need_team').all()
 
-    print "USER RESPONSE:"
-    for resp in user_responses:
-        print resp.description
-        print resp.name
-        print resp.message
-    print "GROUP RESPONSE:"
-    for resp in group_responses:
-        print resp.description
-        print resp.name
-        print resp.message
+    if request.method == 'POST':
+        for u_r in user_responses:
+            key = str(u_r.post_id)+" "+str(u_r.u_id)
+            if request.form[key] == 'Accept':
+                print request.form["group_name"]
+                models.Groups.addNewTwoUsers(request.form["group_name"], u_r.section_id, u_r.assignment_id, currentuser.u_id, u_r.u_id)
+            elif request.form[key] == 'Reject':
+                print "CALL REJECT"
+        for g_r in group_responses:
+            key = str(g_r.post_id)+" "+str(g_r.g_id)
+            if request.form[key] == 'Accept':
+                models.MemberOf.addNew(currentuser.u_id, g_r.g_id)
+            elif request.form[key] == 'Reject':
+                print "CALL REJECT"
         
-            
-
     return render_template('user-inbox.html', user_responses=user_responses, group_responses=group_responses)
 
 @app.template_filter('pluralize')
