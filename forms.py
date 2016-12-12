@@ -63,6 +63,15 @@ class ClassCreateFormFactory:
             num_sect = IntegerField('Number Of Sections')
         return F()
 
+class PostNewFormFactory:
+    @staticmethod
+    def form():
+        class F(FlaskForm):
+            message = TextAreaField('Message')
+            options = [('need_team','looking for team'),('need_member','looking for member')]
+            looking_for = SelectField('Looking For', choices=options)
+        return F()
+
 class AssignmentNewFormFactory:
     @staticmethod
     def form(sections):
@@ -87,3 +96,9 @@ class AssignmentNewFormFactory:
             setattr(F, field_name, BooleanField(default=default))
         return F()
 
+class ResponseFormFactory:
+    @staticmethod
+    def form():
+        class F(FlaskForm):
+            message = TextAreaField()
+        return F()

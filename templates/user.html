@@ -2,7 +2,7 @@
 {% block heading %}My Information: {% endblock %}
 {% block content %}
 <head>
-  <link type="text/css" rel="stylesheet" href="/static/css/style.css"/>
+  <link type="text/css" rel="stylesheet" href="/static/css/myclasses.css"/>
 </head>
 <p>Name: {{user.name}}</p>
 <p>Phone: {{user.phone}}</p>
@@ -11,6 +11,7 @@
 <p>First Major: {{user.first_major}}</p>
 <p>Second Major: {{user.second_major}}</p>
 <p>Graduation Year: {{user.grad_year}}</p>
+<a href="/my_inbox">See Inbox!</a>
 {% endif %}
 
 <div class="listings">
