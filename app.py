@@ -224,42 +224,46 @@ def respond_post(id):
     if not currentuser:
         return redirect('/')
     post = db.session.query(models.Post)\
-              .filter(models.Post.post_id == id)
+              .filter(models.Post.post_id == id).first()
     isRegistered = db.session.query(models.RegisteredWith)\
                    .filter(models.RegisteredWith.section_id == post.section_id and models.RegisteredWith.u_id == currentuser.u_id)
     # if not in class, redirect to profile
     if not isRegistered:
         return redirect('/profile')
     else:
+        assignment = db.session.query(models.ProjectAssignment)\
+                     .filter(models.ProjectAssignment.assignment_id == post.assignment_id).first()
         # if user in group, find it
         group_from = db.session.query(models.Groups)\
                 .join(models.MemberOf)\
-                .join(models.AssignedTo)\
-                .filter(models.AssignedTo.assignment_id == post.assignment_id and models.MemberOf.u_id == currentuser.u_id)
+                .filter(models.MemberOf.u_id == currentuser.u_id)\
+                .join(models.WorkingOn)\
+                .filter(models.WorkingOn.assignment_id == post.assignment_id).first()
         user_to = db.session.query(models.Users)\
-                    .filter(models.Users.u_id == post.u_id)
+                    .filter(models.Users.u_id == post.u_id).first()
         group_to = None
-        if post.type == 'need_member':
+        if post.post_type == 'need_member':
             group_to = db.session.query(models.Groups)\
                        .join(models.MemberOf)\
-                       .join(models.AssignedTo)\
-                       .filter(models.AssignedTo.assignment_id == post.assignment_id and models.MemberOf.u_id == post.u_id)
+                       .filter(models.MemberOf.u_id == user_to.u_id)\
+                       .join(models.WorkingOn)\
+                       .filter(models.WorkingOn.assignment_id == post.assignment_id).first()
 
-        form = forms.ResponseFormFactory();
+        form = forms.ResponseFormFactory().form();
         if form.validate_on_submit():
             try:
                 form.errors.pop('database', None)
                 if group_to:
+                    print "SUCCESS:"
                     models.GroupResponse.addNew(post.post_id, group_to.g_id, post.section_id, form.message.data)
                 else:
                     models.UserResponse.addNew(post.post_id, user_to.u_id, post.section_id, form.message.data)
-                # models.ProjectAssignment.addNew(form.get_sections(), form.max_members.data, form.date_assigned.data, form.date_due.data, form.description.data)
                 return redirect(url_for('classfeed', id=post.assignment_id))
             except BaseException as e:
                 form.errors['database'] = str(e)
-                return render_template('response.html', form=form, user_from=currentuser.name, user_to=user_to.name, group_from=group_from.group_name, group_to=group_to)
+                return render_template('response.html', form=form, user_from=currentuser.name, user_to=user_to.name, group_from=group_from, group_to=group_to, id=id, assignment=assignment)
         else:
-            return render_template('response.html', form=form, user_from=currentuser.name, user_to=user_to.name, group_from=group_from.group_name, group_to=group_to)
+            return render_template('response.html', form=form, user_from=currentuser.name, user_to=user_to.name, group_from=group_from, group_to=group_to, id=id, assignment=assignment)
 
 @app.route('/membersof/<g_id>')
 def membersOf(g_id):

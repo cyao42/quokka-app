@@ -90,5 +90,6 @@ class AssignmentNewFormFactory:
 class ResponseFormFactory:
     @staticmethod
     def form():
-        message = TextAreaField()
+        class F(FlaskForm):
+            message = TextAreaField()
         return F()

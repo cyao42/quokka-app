@@ -87,7 +87,7 @@ class University(db.Model):
 
 class Post(db.Model):
     __tablename__ = 'post'
-    post_id = db.Column('u_id', db.Integer(), primary_key=True)
+    post_id = db.Column('post_id', db.Integer(), primary_key=True)
     assignment_id = db.Column('assignment_id', db.Integer(), db.ForeignKey('projectassignment.assignment_id'), primary_key=True) 
     section_id = db.Column('section_id', db.Integer(), db.ForeignKey('section.section_id'), primary_key=True) 
     u_id = db.Column('u_id', db.Integer(), db.ForeignKey('users.u_id'))
@@ -196,13 +196,13 @@ class GroupResponse(db.Model):
     post_id = db.Column('post_id', db.Integer(), db.ForeignKey('post.post_id'), primary_key=True)
     g_id = db.Column('g_id', db.Integer(), db.ForeignKey('groups.g_id'), primary_key=True)
     section_id = db.Column('section_id', db.Integer(), db.ForeignKey('section.section_id'), primary_key=True)
-    time_posted = db.Column('time_posted', db.Integer())
+    time_posted = db.Column('time_posted', db.String(100))
     message = db.Column('message', db.String(1000))
     approved = db.Column('approved', db.Boolean())
     @staticmethod
     def addNew(post_id, g_id, section_id, message):
         try:
-            time = datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S')
+            time = str(datetime.datetime.now())
             db.session.execute('INSERT INTO groupresponse VALUES(:post_id, :g_id, :section_id, :time_posted, :message, :approved)',
                                dict(post_id=post_id, g_id=g_id, section_id=section_id, time_posted=time, message=message, approved=False))
             db.session.commit()
@@ -215,13 +215,13 @@ class UserResponse(db.Model):
     post_id = db.Column('post_id', db.Integer(), db.ForeignKey('post.post_id'), primary_key=True)
     u_id = db.Column('g_id', db.Integer(), db.ForeignKey('users.u_id'), primary_key=True)
     section_id = db.Column('section_id', db.Integer(), db.ForeignKey('section.section_id'), primary_key=True)
-    time_posted = db.Column('time_posted', db.Integer())
+    time_posted = db.Column('time_posted', db.String())
     message = db.Column('message', db.String(1000))
     approved = db.Column('approved', db.Boolean())
     @staticmethod
     def addNew(post_id, u_id, section_id, message):
         try:
-            time = datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S')
+            time = str(datetime.datetime.now())
             db.session.execute('INSERT INTO groupresponse VALUES(:post_id, :u_id, :section_id, :time_posted, :m\
 essage, :approved)',
                                dict(post_id=post_id, u_id=u_id, section_id=section_id, time_posted=time, message=message, approved=False))

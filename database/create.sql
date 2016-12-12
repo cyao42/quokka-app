@@ -101,7 +101,7 @@ CREATE TABLE Post
  assignment_id INTEGER NOT NULL REFERENCES ProjectAssignment(assignment_id),
  section_id INTEGER NOT NULL REFERENCES Section(section_id),
  u_id INTEGER NOT NULL REFERENCES Users(u_id),
- post_type CHAR(12) NOT NULL CHECK (post_type IN ('need_team', 'need_member')),
+ post_type VARCHAR(12) NOT NULL CHECK (post_type IN ('need_team', 'need_member')),
  message VARCHAR(100) NOT NULL,
  time_posted VARCHAR(100) NOT NULL
 );
@@ -124,25 +124,28 @@ CREATE TABLE WorkingOn
 
 CREATE TABLE StudyingFor 
 (g_id INTEGER NOT NULL REFERENCES Groups(g_id),
+ section_id INTEGER NOT NULL REFERENCES Section(section_id),
  PRIMARY KEY (g_id,section_id),
  FOREIGN KEY (section_id)
  REFERENCES Section(section_id)
 );
 
 CREATE TABLE GroupResponse
-(post_id INTEGER NOT NULL PRIMARY KEY REFERENCES Post(post_id),
- g_id INTEGER NOT NULL PRIMARY KEY REFERENCES Groups(g_id),
- section_id INTEGER NOT NULL PRIMARY KEY REFERENCES Section(section_id),
- time_posted INTEGER NOT NULL,
+(post_id INTEGER NOT NULL REFERENCES Post(post_id),
+ g_id INTEGER NOT NULL REFERENCES Groups(g_id),
+ section_id INTEGER NOT NULL REFERENCES Section(section_id),
+ time_posted VARCHAR(100) NOT NULL,
  message VARCHAR(1000),
- approved BOOLEAN NOT NULL
+ approved BOOLEAN NOT NULL,
+ PRIMARY KEY (post_id, g_id, section_id)
 );
 
 CREATE TABLE UserResponse
-(post_id INTEGER NOT NULL PRIMARY KEY REFERENCES Post(post_id),
- u_id INTEGER NOT NULL PRIMARY KEY REFERENCES Groups(g_id),
- section_id INTEGER NOT NULL PRIMARY KEY REFERENCES Section(section_id),
- time_posted INTEGER NOT NULL,
+(post_id INTEGER NOT NULL REFERENCES Post(post_id),
+ u_id INTEGER NOT NULL REFERENCES Groups(g_id),
+ section_id INTEGER NOT NULL REFERENCES Section(section_id),
+ time_posted VARCHAR(100) NOT NULL,
  message VARCHAR(1000),
- approved BOOLEAN NOT NULL
+ approved BOOLEAN NOT NULL,
+ PRIMARY KEY (post_id, u_id, section_id)
 );
