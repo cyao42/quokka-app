@@ -38,7 +38,7 @@ CREATE TABLE MemberOf
 );
 
 CREATE TABLE University
-(university_name VARCHAR(265) NOT NULL,
+(university_name VARCHAR(265) NOT NULL UNIQUE,
  university_location VARCHAR(265) NOT NULL,
  PRIMARY KEY (university_name, university_location)
 );
