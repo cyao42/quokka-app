@@ -29,7 +29,9 @@
 <p>Section: {{classThing.section_number}}</p>
 <p>Semester: {{classThing.course_semester}}</p>
 <p>@ {{classThing.university_name}}</p>
+{% if isStudent %}
 <a href="{{url_for('new_group', sectionid=classThing.section_id)}}">Add Group</a>
+{% endif %}
 {% endfor %}
 </ul>
 {% else %}
@@ -38,7 +40,7 @@
 {% if isStudent %}
 <p>Register for a class <a href="/register-class">here</a>!</p>
 {% else %}
-<p>Create a new class <a href="/register-class">here</a>!</p>
+<p>Create a new class <a href="/create-class">here</a>!</p>
 <p>Add a new assignment <a href="/new-assignment">here</a>!</p>
 {% endif %}
 {% endblock %}
