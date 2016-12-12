@@ -333,7 +333,13 @@ def membersOf(g_id):
             .filter(models.MemberOf.g_id == g_id).all()
     group = db.session.query(models.Groups)\
             .filter(models.Groups.g_id == g_id).first()
-    return render_template('membersof.html', member=member, group=group)
+    group_type = db.session.query(models.ProjectAssignment)\
+                 .join(models.WorkingOn)\
+                 .filter(models.WorkingOn.g_id == group.g_id).first()
+    assign = "Study Group"
+    if(group_type):
+        assign = group_type.description
+    return render_template('membersof.html', member=member, group=group, assign=assign)
 
 @app.route('/my_inbox', methods=['GET', 'POST'])
 def inbox():
