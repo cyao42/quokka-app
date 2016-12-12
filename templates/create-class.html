@@ -1,0 +1,49 @@
+{% extends 'layout.html' %}
+{% block heading %}New Class Information: {% endblock %}
+{% block content %}
+<form action="/create-class" method="POST">
+  {{form.csrf_token}}
+  <p>
+    Select a University: {{form.university}}
+    {% if form.university.errors %}
+    <ul>{% for error in form.university.errors %}<li>{{error}}</li>{% endfor %}</ul>
+    {% endif %}
+  </p>
+  <p>or Add a New University <a href="/create-university">here</a>!</p>
+  <p>
+    Course Name: {{form.course_name}}
+    {% if form.course_name %}
+    <ul>{% for error in form.course_name.errors %}<li>{{error}}</li>{% endfor %}</ul>
+    {% endif %}
+  </p>
+  <p>
+    Course PreFix: {{form.course_pre}}
+    {% if form.course_pre.errors %}
+    <ul>{% for error in form.course_pre.errors %}<li>{{error}}</li>{% endfor %}</ul>
+    {% endif %}
+  </p>
+  <p>
+    Course Code: {{form.course_code}}
+    {% if form.course_code.errors %}
+    <ul>{% for error in form.course_code.errors %}<li>{{error}}</li>{% endfor %}</ul>
+    {% endif %}
+  </p>
+  <p>
+    Couse Semester: {{form.course_semester}}
+    {% if form.course_semester.errors %}
+    <ul>{% for error in form.course_semester.errors %}<li>{{error}}</li>{% endfor %}</ul>
+    {% endif %}
+    <p>{% if msg %}{{msg}}{% endif %}</p>
+  </p>
+  <p>
+    Number of Sections: {{form.num_sect}}
+    {% if form.num_sect.errors %}
+    <ul>{% for error in form.num_sect.errors %}<li>{{error}}</li>{% endfor %}</ul>
+    {% endif %}
+  </p>
+  <hr/>
+  <input type="reset" value="Reset"/>
+  <input type="submit" value="Submit"/>
+  {% if 'database' in form.errors %}<p>{{form.errors['database']}}</p>{% endif %}
+</form>
+{% endblock %}

@@ -40,6 +40,38 @@ class ClassRegisterFormFactory:
             section_code = StringField(default='')
         return F()
 
+class UniversityCreateFormFactory:
+    @staticmethod
+    def form():
+        class F(FlaskForm):
+            u_loc = StringField('New University Location')
+            u_name = StringField('New University Name')
+        return F()
+
+class ClassCreateFormFactory:
+    @staticmethod
+    def form(universities):
+        class F(FlaskForm):
+            u_options = [(u.university_name, u.university_name) for u in universities]
+            university = SelectField('University', choices=u_options)
+            u_loc = StringField('New University Location')
+            u_name = StringField('New University Name')
+            course_code = StringField('Course Code')
+            course_semester = StringField('Course Semester')
+            course_pre = StringField('Course Prefix')
+            course_name = StringField('Course Name')
+            num_sect = IntegerField('Number Of Sections')
+        return F()
+
+class PostNewFormFactory:
+    @staticmethod
+    def form():
+        class F(FlaskForm):
+            message = TextAreaField('Message')
+            options = [('need_team','looking for team'),('need_member','looking for member')]
+            looking_for = SelectField('Looking For', choices=options)
+        return F()
+
 class AssignmentNewFormFactory:
     @staticmethod
     def form(sections):
@@ -64,3 +96,9 @@ class AssignmentNewFormFactory:
             setattr(F, field_name, BooleanField(default=default))
         return F()
 
+class ResponseFormFactory:
+    @staticmethod
+    def form():
+        class F(FlaskForm):
+            message = TextAreaField()
+        return F()

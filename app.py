@@ -3,6 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import and_
 import models
 import forms
+import datetime
 
 app = Flask(__name__)
 app.secret_key = 's3cr3t'
@@ -84,6 +85,26 @@ def user():
     else:
         return redirect('/')
 
+@app.route('/create-post/<assignment_id>/<section_id>', methods=['GET', 'POST'])
+def createPost(assignment_id, section_id):
+    global currentuser
+    if not currentuser:
+        return redirect('/')
+    section = db.session.query(models.Section)\
+                .filter(models.Section.section_id == section_id).one()
+    form = forms.PostNewFormFactory.form()
+    if form.validate_on_submit():
+        try:
+            form.errors.pop('database', None)
+            time = str(datetime.datetime.now())
+            models.Post.addNew(assignment_id, section.section_id, currentuser.u_id, form.looking_for.data, form.message.data,time)
+            return redirect(url_for('getAllPosts', section_id=section.section_id, assignment_id = assignment_id))
+        except BaseException as e:
+            form.errors['database'] = str(e)
+            return render_template('new-post.html', form=form, assignment_id=assignment_id, section_id=section_id)
+    else:
+        return render_template('new-post.html', form=form, assignment_id=assignment_id, section_id=section_id)
+
 @app.route('/register-class', methods=['GET', 'POST'])
 def register_class():
     global currentuser
@@ -107,6 +128,54 @@ def register_class():
     else:
         return render_template('register-class.html', form=form)
 
+@app.route('/create-class', methods=['GET', 'POST'])
+def create_class():
+    global currentuser
+    if not currentuser:
+        return redirect('/')
+    
+    universities = db.session.query(models.University).all()
+    form = forms.ClassCreateFormFactory.form(universities)
+    if form.validate_on_submit():
+        try:
+            form.errors.pop('database', None)
+            university = db.session.query(models.University)\
+                .filter(models.University.university_name == form.university.data).first()
+            if university:
+                models.Course.addNew(form.course_code.data,form.course_semester.data,university.university_name,university.university_location,form.course_name.data,form.course_pre.data)
+                startSect = db.session.query(models.Section).count()+1
+                for x in xrange(1,form.num_sect.data+1):
+                    models.Section.addNew(form.course_code.data,form.course_semester.data,university.university_name,university.university_location,x)
+                endSect = db.session.query(models.Section).count()
+                for s in xrange(startSect,endSect+1):
+                    models.RegisteredWith.addNew(currentuser.u_id, s)
+                return redirect('/profile')
+            else:
+                return render_template('create-class.html', form=form)
+        except BaseException as e:
+            form.errors['database'] = str(e)
+            return render_template('create-class.html', form=form)
+    else:
+        return render_template('create-class.html', form=form)
+
+@app.route('/create-university', methods=['GET', 'POST'])
+def create_university():
+    global currentuser
+    if not currentuser:
+        return redirect('/')
+    
+    form = forms.UniversityCreateFormFactory.form()
+    if form.validate_on_submit():
+        try:
+            form.errors.pop('database', None)
+            models.University.addNew(form.u_name.data,form.u_loc.data)
+            return redirect('/create-class')
+        except BaseException as e:
+            form.errors['database'] = str(e)
+            return render_template('create-university.html', form=form)
+    else:
+        return render_template('create-university.html', form=form)
+
 @app.route('/register-user/', methods=['GET', 'POST'])
 def register_user():
     global currentuser
@@ -119,8 +188,7 @@ def register_user():
             if(email_check):
                 return render_template('register.html', form=form, msg="User with that email already exists")
             else:
-                models.Users.addNew(form.name.data, form.phone.data, form.email.data, form.user_type.data, form.password\
-.data)
+                models.Users.addNew(form.name.data, form.phone.data, form.email.data, form.user_type.data, form.password.data)
                 currentuser = db.session.query(models.Users).filter(models.Users.email == form.email.data).first()
                 return redirect('/profile')
         except BaseException as e:
@@ -133,20 +201,62 @@ def register_user():
 def classfeed(id):
     section = db.session.query(models.Section)\
         .filter(models.Section.section_id == id).one()
-    course_code = section.course_code
+    course = db.session.query(models.Course)\
+                    .filter(models.Course.course_code == section.course_code).one()
     assignments = db.session.query(models.ProjectAssignment)\
                     .join(models.AssignedTo)\
                     .join(models.Section)\
-                    .filter(models.Section.section_id == id)
-    return render_template('classfeed.html', section = section, assignments = assignments)
+                    .filter(models.Section.section_id == id).all()
+    return render_template('classfeed.html', section = section, course = course, assignments = assignments)
 
-@app.route('/classfeed/', methods=['GET', 'POST'])
-def getPosts(): 
-    assignment_id = request.form.get('selected_assignment')
+@app.route('/posts/<section_id>', methods=['GET', 'POST'])
+def getPosts(section_id): 
+    section = db.session.query(models.Section)\
+                .filter(models.Section.section_id==section_id).one()
+    course = db.session.query(models.Course)\
+                .filter(models.Course.course_code == section.course_code).one()
+    assignment_id = request.form.get('selected_assignment')    
     assignment = db.session.query(models.ProjectAssignment)\
-        .filter(models.ProjectAssignment.assignment_id == assignment_id).one()
-    posts = assignment.posts
-    return render_template('classfeed-posts.html', posts=posts, assignment=assignment)
+                .filter(models.ProjectAssignment.assignment_id == assignment_id).one()
+    posts = db.session.query(models.Post)\
+            .filter(models.Post.section_id==section.section_id, models.Post.assignment_id==assignment_id)
+    return render_template('classfeed-posts.html', posts=posts, assignment=assignment, course=course, section=section)
+
+@app.route('/posts/<section_id>/<assignment_id>/all', methods=['GET', 'POST'])
+def getAllPosts(section_id, assignment_id): 
+    section = db.session.query(models.Section)\
+                .filter(models.Section.section_id==section_id).one()   
+    course = db.session.query(models.Course)\
+                .filter(models.Course.course_code == section.course_code).one()
+    assignment = db.session.query(models.ProjectAssignment)\
+                .filter(models.ProjectAssignment.assignment_id == assignment_id).one()
+    posts = db.session.query(models.Post)\
+            .filter(models.Post.section_id==section.section_id, models.Post.assignment_id==assignment_id)
+    return render_template('classfeed-posts.html', posts=posts, assignment=assignment, course=course, section=section)
+
+@app.route('/posts/<section_id>/<assignment_id>/need_member', methods=['GET', 'POST'])
+def getNeedMemberPosts(section_id, assignment_id): 
+    section = db.session.query(models.Section)\
+                .filter(models.Section.section_id==section_id).one()   
+    course = db.session.query(models.Course)\
+                .filter(models.Course.course_code == section.course_code).one()
+    assignment = db.session.query(models.ProjectAssignment)\
+                .filter(models.ProjectAssignment.assignment_id == assignment_id).one()
+    posts = db.session.query(models.Post)\
+            .filter(models.Post.section_id==section.section_id, models.Post.assignment_id==assignment_id, models.Post.post_type=="need_member")
+    return render_template('classfeed-posts.html', posts=posts, assignment=assignment, course=course, section=section)
+
+@app.route('/posts/<section_id>/<assignment_id>/need_team', methods=['GET', 'POST'])
+def getNeedTeamPosts(section_id, assignment_id): 
+    section = db.session.query(models.Section)\
+                .filter(models.Section.section_id==section_id).one()   
+    course = db.session.query(models.Course)\
+                .filter(models.Course.course_code == section.course_code).one()
+    assignment = db.session.query(models.ProjectAssignment)\
+                .filter(models.ProjectAssignment.assignment_id == assignment_id).one()
+    posts = db.session.query(models.Post)\
+            .filter(models.Post.section_id==section.section_id, models.Post.assignment_id==assignment_id, models.Post.post_type=="need_team")
+    return render_template('classfeed-posts.html', posts=posts, assignment=assignment, course=course, section=section)
 
 @app.route('/new-assignment', methods=['GET', 'POST'])
 def new_assignment():
@@ -158,12 +268,10 @@ def new_assignment():
             .join(models.RegisteredWith)\
             .filter(models.RegisteredWith.u_id == currentuser.u_id)
     form = forms.AssignmentNewFormFactory.form(sections)
-    print "IS FORM VALIDATED?"
     if form.validate_on_submit():
-        print "VALIDATED!!!"
         try:
             form.errors.pop('database', None)
-            models.ProjectAssignment.addNew(form.get_sections(), form.max_members.data, form.date_assigned.data, form.date_due.data, form.description.data)
+            models.ProjectAssignment.addNew(form.get_sections(),form.max_members.data,form.date_assigned.data,form.date_due.data,form.description.data)
             return redirect('/profile')
         except BaseException as e:
             form.errors['database'] = str(e)
@@ -171,6 +279,92 @@ def new_assignment():
     else:
         return render_template('new-assignment.html', form=form)
 
+@app.route('/respond/<id>', methods=['GET', 'POST'])
+def respond_post(id):
+    global currentuser
+    #check for if person is logged in
+    if not currentuser:
+        return redirect('/')
+    post = db.session.query(models.Post)\
+              .filter(models.Post.post_id == id).first()
+    isRegistered = db.session.query(models.RegisteredWith)\
+                   .filter(models.RegisteredWith.section_id == post.section_id and models.RegisteredWith.u_id == currentuser.u_id)
+    # if not in class, redirect to profile
+    if not isRegistered:
+        return redirect('/profile')
+    else:
+        assignment = db.session.query(models.ProjectAssignment)\
+                     .filter(models.ProjectAssignment.assignment_id == post.assignment_id).first()
+        # if user in group, find it
+        group_from = db.session.query(models.Groups)\
+                .join(models.MemberOf)\
+                .filter(models.MemberOf.u_id == currentuser.u_id)\
+                .join(models.WorkingOn)\
+                .filter(models.WorkingOn.assignment_id == post.assignment_id).first()
+        user_to = db.session.query(models.Users)\
+                    .filter(models.Users.u_id == post.u_id).first()
+        group_to = None
+        if post.post_type == 'need_member':
+            group_to = db.session.query(models.Groups)\
+                       .join(models.MemberOf)\
+                       .filter(models.MemberOf.u_id == user_to.u_id)\
+                       .join(models.WorkingOn)\
+                       .filter(models.WorkingOn.assignment_id == post.assignment_id).first()
+
+        form = forms.ResponseFormFactory().form();
+        if form.validate_on_submit():
+            try:
+                form.errors.pop('database', None)
+                if group_from:
+                    models.GroupResponse.addNew(post.post_id, group_from.g_id, post.section_id, form.message.data)
+                else:
+                    models.UserResponse.addNew(post.post_id, currentuser.u_id, post.section_id, form.message.data)
+                return redirect(url_for('classfeed', id=post.assignment_id))
+            except BaseException as e:
+                form.errors['database'] = str(e)
+                return render_template('response.html', form=form, user_from=currentuser.name, user_to=user_to.name, group_from=group_from, group_to=group_to, id=id, assignment=assignment)
+        else:
+            return render_template('response.html', form=form, user_from=currentuser.name, user_to=user_to.name, group_from=group_from, group_to=group_to, id=id, assignment=assignment)
+
+@app.route('/membersof/<g_id>')
+def membersOf(g_id):
+    member = db.session.query(models.Student)\
+        .join(models.MemberOf, (models.Student.u_id == models.MemberOf.u_id))\
+            .filter(models.MemberOf.g_id == g_id).all()
+    group = db.session.query(models.Groups)\
+            .filter(models.Groups.g_id == g_id).first()
+    return render_template('membersof.html', member=member, group=group)
+
+@app.route('/my_inbox', methods=['GET', 'POST'])
+def inbox():
+    user_responses = db.session.query(models.UserResponse, models.ProjectAssignment.description, models.Users.name, models.UserResponse.u_id, models.UserResponse.post_id, models.UserResponse.message, models.UserResponse.time_posted, models.Post.assignment_id, models.Post.section_id)\
+                     .join(models.Post)\
+                     .join(models.Users, models.Users.u_id == models.UserResponse.u_id)\
+                     .join(models.ProjectAssignment)\
+                     .filter(models.Post.post_type == 'need_team' and models.Post.u_id == currentuser.u_id).all()\
+ 
+    group_responses = db.session.query(models.GroupResponse, models.ProjectAssignment.description, models.Groups.group_name, models.GroupResponse.g_id, models.GroupResponse.post_id, models.GroupResponse.message, models.GroupResponse.time_posted)\
+                      .join(models.Post)\
+                      .join(models.Groups)\
+                      .join(models.ProjectAssignment)\
+                      .filter(models.Post.post_id == models.GroupResponse.post_id and models.Post.post_type == 'need_team').all()
+
+    if request.method == 'POST':
+        for u_r in user_responses:
+            key = str(u_r.post_id)+" "+str(u_r.u_id)
+            if request.form[key] == 'Accept':
+                print request.form["group_name"]
+                models.Groups.addNewTwoUsers(request.form["group_name"], u_r.section_id, u_r.assignment_id, currentuser.u_id, u_r.u_id)
+            elif request.form[key] == 'Reject':
+                print "CALL REJECT"
+        for g_r in group_responses:
+            key = str(g_r.post_id)+" "+str(g_r.g_id)
+            if request.form[key] == 'Accept':
+                models.MemberOf.addNew(currentuser.u_id, g_r.g_id)
+            elif request.form[key] == 'Reject':
+                print "CALL REJECT"
+        
+    return render_template('user-inbox.html', user_responses=user_responses, group_responses=group_responses)
 
 @app.template_filter('pluralize')
 def pluralize(number, singular='', plural='s'):
