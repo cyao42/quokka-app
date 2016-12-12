@@ -144,8 +144,9 @@ def classfeed(id):
 def getPosts(): 
     assignment_id = request.form.get('selected_assignment')
     assignment = db.session.query(models.ProjectAssignment)\
-    #posts = assignment.posts
-    return render_template('classfeed.html', assignment=assignment)
+        .filter(models.ProjectAssignment.assignment_id == assignment_id).all()
+    posts = assignment.posts
+    return render_template('classfeed.html', posts=posts, assignment=assignment)
 
 @app.route('/membersof/<g_id>')
 def membersOf(g_id):
@@ -155,30 +156,6 @@ def membersOf(g_id):
     group = db.session.query(models.Groups)\
        .filter(models.Groups.g_id == g_id).first()
     return render_template('membersof.html', member=member, group=group)
-
-@app.route('/new-assignment', methods=['GET', 'POST'])
-def new_assignment():
-    global currentuser
-    if not currentuser:
-        return redirect('/')
-
-    sections = db.session.query(models.Section)\
-            .join(models.RegisteredWith)\
-            .filter(models.RegisteredWith.u_id == currentuser.u_id)
-    form = forms.AssignmentNewFormFactory.form(sections)
-    print "IS FORM VALIDATED?"
-    if form.validate_on_submit():
-        print "VALIDATED!!!"
-        try:
-            form.errors.pop('database', None)
-            models.ProjectAssignment.addNew(form.get_sections(), form.max_members.data, form.date_assigned.data, form.date_due.data, form.description.data)
-            return redirect('/profile')
-        except BaseException as e:
-            form.errors['database'] = str(e)
-            return render_template('new-assignment.html', form=form)
-    else:
-        return render_template('new-assignment.html', form=form)
-
 
 @app.template_filter('pluralize')
 def pluralize(number, singular='', plural='s'):
