@@ -133,21 +133,23 @@ CREATE TABLE WorkingOn
 
 CREATE TABLE StudyingFor 
 (g_id INTEGER NOT NULL REFERENCES Groups(g_id),
- section_id INTEGER NOT NULL,
  PRIMARY KEY (g_id,section_id),
  FOREIGN KEY (section_id)
  REFERENCES Section(section_id)
 );
 
---List the names and groups of all leaders.--
+CREATE TABLE GroupResponse
+(post_id INTEGER NOT NULL PRIMARY KEY REFERENCES Post(post_id),
+ g_id INTEGER NOT NULL PRIMARY KEY REFERENCES Groups(g_id),
+ section_id INTEGER NOT NULL PRIMARY KEY REFERENCES Section(section_id),
+ time_posted INTEGER NOT NULL,
+ message VARCHAR(1000)
+);
 
-SELECT Users.name, group_name FROM Users, Groups, MemberOf
-WHERE MemberOf.u_id = Users.u_id AND MemberOf.g_id = Groups.g_id AND MemberOf.is_leader = 'yes';
-
---List names of all users who have posted that they need a team, but are now part of a group.--
-
-SELECT Users.name FROM Users NATURAL JOIN NeedTeamPost NATURAL JOIN MemberOf NATURAL JOIN Groups;
-
---List the names of all users who are not part of a group.--
-
-SELECT Users.name FROM Users EXCEPT (SELECT Users.name FROM Users NATURAL JOIN MemberOf NATURAL JOIN Groups);
+CREATE TABLE UserResponse
+(post_id INTEGER NOT NULL PRIMARY KEY REFERENCES Post(post_id),
+ u_id INTEGER NOT NULL PRIMARY KEY REFERENCES Groups(g_id),
+ section_id INTEGER NOT NULL PRIMARY KEY REFERENCES Section(section_id),
+ time_posted INTEGER NOT NULL,
+ message VARCHAR(1000)
+);

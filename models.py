@@ -197,3 +197,19 @@ class StudyingFor(db.Model):
     __tablename__ = 'studyingfor'
     g_id = db.Column('g_id', db.Integer(), db.ForeignKey('groups.g_id'), primary_key=True)
     section_id = db.Column('section_id', db.Integer(), db.ForeignKey('section.section_id'), primary_key=True)
+
+class GroupResponse(db.Model):
+    __tablename__ = 'groupresponse'
+    post_id = db.Column('post_id', db.Integer(), db.ForeignKey('post.post_id'), primary_key=True)
+    g_id = db.Column('g_id', db.Integer(), db.ForeignKey('groups.g_id'), primary_key=True)
+    section_id = db.Column('section_id', db.Integer(), db.ForeignKey('section.section_id'), primary_key=True)
+    time_posted = db.Column('time_posted', db.Integer())
+    message = db.Column('message', db.String(1000))
+
+class UserResponse(db.Model):
+    __tablename__ = 'groupresponse'
+    post_id = db.Column('post_id', db.Integer(), db.ForeignKey('post.post_id'), primary_key=True)
+    u_id = db.Column('g_id', db.Integer(), db.ForeignKey('users.u_id'), primary_key=True)
+    section_id = db.Column('section_id', db.Integer(), db.ForeignKey('section.section_id'), primary_key=True)
+    time_posted = db.Column('time_posted', db.Integer())
+    message = db.Column('message', db.String(1000))
