@@ -9,7 +9,7 @@ class GroupNewFormFactory:
         class F(FlaskForm):
             name = StringField(default='')
             assign_options = [("none", "Study Group")]
-            assign_options.extend([(str(assign.assignment_id), assign.assignment_id) for assign in assignments])
+            assign_options.extend([(str(assign.assignment_id), assign.description) for assign in assignments])
             assign = SelectField('Assignment', choices=assign_options)
         return F()
 
@@ -109,3 +109,9 @@ class AssignmentNewFormFactory:
             setattr(F, field_name, BooleanField(default=default))
         return F()
 
+class ResponseFormFactory:
+    @staticmethod
+    def form():
+        class F(FlaskForm):
+            message = TextAreaField()
+        return F()

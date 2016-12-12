@@ -11,6 +11,7 @@
 <p>First Major: {{user.first_major}}</p>
 <p>Second Major: {{user.second_major}}</p>
 <p>Graduation Year: {{user.grad_year}}</p>
+<a href="/my_inbox">See Inbox!</a>
 {% endif %}
 <p>Edit your profile<a href="/edit-profile"> here</a>!</p>
 
@@ -54,7 +55,6 @@
 </div>
 {% if isStudent %}
 <p>Register for a class <a href="/register-class">here</a>!</p>
-<p>Make a post! <a href="/create-post">Click here</a>!</p>
 {% else %}
 <p>Create a class <a href="/create-class">here</a>!</p>
 <p>Create a new assignment <a href="/new-assignment">here</a>!</p>
