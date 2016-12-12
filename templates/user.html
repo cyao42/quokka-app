@@ -1,6 +1,9 @@
 {% extends 'layout.html' %}
 {% block heading %}My Information: {% endblock %}
 {% block content %}
+<head>
+  <link type="text/css" rel="stylesheet" href="/static/css/myclasses.css"/>
+</head>
 <p>Name: {{user.name}}</p>
 <p>Phone: {{user.phone}}</p>
 <p>E-mail: {{user.email}}</p>
@@ -14,7 +17,7 @@
 <h2>My Groups:</h2>
 {% if groups|length > 0 %}
 <ul>
-{% for group in groups %}<li>{{group.group_name}}</li>{% endfor %}
+{% for group in groups %}<li><a href="{{url_for('membersOf', g_id=group.g_id)}}">{{group.group_name}}</a></li>{% endfor %}
 </ul>
 {% else %}
 <p>You are not in any groups!</p>

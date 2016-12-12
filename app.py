@@ -215,6 +215,14 @@ def new_assignment():
     else:
         return render_template('new-assignment.html', form=form)
 
+@app.route('/membersof/<g_id>')
+def membersOf(g_id):
+    member = db.session.query(models.Student)\
+        .join(models.MemberOf, (models.Student.u_id == models.MemberOf.u_id))\
+            .filter(models.MemberOf.g_id == g_id).all()
+    group = db.session.query(models.Groups)\
+            .filter(models.Groups.g_id == g_id).first()
+    return render_template('membersof.html', member=member, group=group)
 
 @app.template_filter('pluralize')
 def pluralize(number, singular='', plural='s'):
