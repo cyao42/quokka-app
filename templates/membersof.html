@@ -10,10 +10,14 @@
     <br></br>
      <div class="groups">
   {% for m in member %}
-  <section>
-  <h3>{{m.name}}</h3>
-  <h3>{{m.first_major}}</h3>
-  </section>
+  <div class="information">
+  <p>{{m.name}}</p>
+  <p>Email: {{m.email}}</p>
+  <p>Phone: {{m.phone}}</p>
+  <p>Major 1: {{m.first_major}}</p>
+  <p>Major 2: {{m.second_major}}</p>
+  <p>Grad Year: {{m.grad_year}}</p>
+  </div>
   {% endfor %}
      </div>
   </body>
