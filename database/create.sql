@@ -97,22 +97,13 @@ REFERENCES Section (section_id)
 );
 
 CREATE TABLE Post
-(assignment_id INTEGER NOT NULL REFERENCES ProjectAssignment(assignment_id),
- time_posted VARCHAR(100) NOT NULL,
- message VARCHAR(1000),
- PRIMARY KEY (assignment_id, time_posted)
-);
-
-CREATE TABLE NeedTeamPost
-(assignment_id INTEGER NOT NULL REFERENCES ProjectAssignment(assignment_id),
+(post_id INTEGER NOT NULL PRIMARY KEY,
+ assignment_id INTEGER NOT NULL REFERENCES ProjectAssignment(assignment_id),
+ section_id INTEGER NOT NULL REFERENCES Section(section_id),
  u_id INTEGER NOT NULL REFERENCES Users(u_id),
- PRIMARY KEY (assignment_id, u_id)
-);
-
-CREATE TABLE NeedMemberPost
-(assignment_id INTEGER NOT NULL REFERENCES ProjectAssignment(assignment_id),
- g_id INTEGER NOT NULL REFERENCES Groups(g_id),
- PRIMARY KEY (assignment_id, g_id)
+ post_type CHAR(12) NOT NULL CHECK (post_type IN ('need_team', 'need_member')),
+ message VARCHAR(100) NOT NULL,
+ time_posted VARCHAR(100) NOT NULL
 );
 
 CREATE TABLE ProjectGroup
