@@ -87,7 +87,12 @@ def user():
                   join(models.RegisteredWith).\
                   join(models.Course, and_(models.Section.course_code==models.Course.course_code, models.Section.course_semester==models.Course.course_semester, models.Section.university_name==models.Course.university_name, models.Section.university_location==models.Course.university_location)).\
                   filter(models.RegisteredWith.u_id == currentuser.u_id).all()
-        return render_template('user.html', user=currentuser, isStudent=isStudent, groups=groups, classes=classes)
+        assignments = db.session.query(models.ProjectAssignment, models.Section.section_id, models.ProjectAssignment.assignment_id, models.ProjectAssignment.date_due, models.ProjectAssignment.description).\
+                join(models.AssignedTo).\
+                join(models.Section).\
+                join(models.RegisteredWith).\
+                filter(models.RegisteredWith.u_id == currentuser.u_id).all()
+        return render_template('user.html', user=currentuser, isStudent=isStudent, groups=groups, classes=classes, assignments=assignments)
     else:
         return redirect('/')
 
