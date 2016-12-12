@@ -11,7 +11,7 @@
 \COPY ProjectAssignment(assignment_id, max_members, date_assigned, date_due, description) FROM 'data/ProjectAssignment.dat' WITH DELIMITER ',' NULL '' CSV
 \COPY AssignedTo(assignment_id, section_id) FROM 'data/AssignedTo.dat' WITH DELIMITER ',' NULL '' CSV
 \COPY Post(post_id, assignment_id, section_id, u_id, post_type, message, time_posted) FROM 'data/Post.dat' WITH DELIMITER ',' NULL '' CSV
-COPY ProjectGroup(g_id, name) FROM 'data/ProjectGroup.dat' WITH DELIMITER ',' NULL '' CSV
+\COPY ProjectGroup(g_id, name) FROM 'data/ProjectGroup.dat' WITH DELIMITER ',' NULL '' CSV
 \COPY StudyGroup(g_id, name) FROM 'data/StudyGroup.dat' WITH DELIMITER ',' NULL '' CSV
 \COPY WorkingOn(g_id, assignment_id) FROM 'data/WorkingOn.dat' WITH DELIMITER ',' NULL '' CSV
 \COPY StudyingFor(g_id, section_id) FROM 'data/StudyingFor.dat' WITH DELIMITER ',' NULL '' CSV

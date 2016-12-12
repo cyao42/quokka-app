@@ -2,7 +2,7 @@
 {% block heading %}My Information: {% endblock %}
 {% block content %}
 <head>
-  <link type="text/css" rel="stylesheet" href="/static/css/myclasses.css"/>
+  <link type="text/css" rel="stylesheet" href="/static/css/style.css"/>
 </head>
 <p>Name: {{user.name}}</p>
 <p>Phone: {{user.phone}}</p>
@@ -53,6 +53,7 @@
 </div>
 {% if isStudent %}
 <p>Register for a class <a href="/register-class">here</a>!</p>
+<p>Make a post! <a href="/create-post">Click here</a>!</p>
 {% else %}
 <p>Create a class <a href="/create-class">here</a>!</p>
 <p>Create a new assignment <a href="/new-assignment">here</a>!</p>
