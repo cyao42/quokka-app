@@ -1,4 +1,4 @@
-from sqlalchemy import sql, orm
+from sqlalchemy import sql, orm, join
 from sqlalchemy.sql import text 
 from app import db
 
@@ -93,6 +93,17 @@ class University(db.Model):
             db.session.rollback()
             raise e
 
+class Post(db.Model):
+    __tablename__ = 'post'
+    assignment_id = db.Column('assignment_id', db.Integer(), db.ForeignKey('projectassignment.assignment_id'), primary_key=True) 
+    time_posted = db.Column('time_posted', db.String(), primary_key=True)
+    message = db.Column('message', db.String(1000))
+
+class AssignedTo(db.Model):
+    __tablename__ = 'assignedto'
+    assignment_id = db.Column('assignment_id', db.String(256), db.ForeignKey('projectassignment.assignment_id'), primary_key=True)
+    section_id = db.Column('section_id', db.Integer(), db.ForeignKey('section.section_id'), primary_key=True)      
+
 class Course(db.Model):
     __tablename__ = 'course'
     course_code = db.Column('course_code', db.String(256), primary_key=True)
@@ -145,7 +156,6 @@ class RegisteredWith(db.Model):
             db.session.rollback()
             raise e
 
-
 class Add(db.Model):
     __tablename__ = 'join'
     j_id = db.Column('j_id', db.Integer(), primary_key=True)
@@ -173,18 +183,19 @@ class ProjectAssignment(db.Model):
     date_due = db.Column('date_due', db.String(20))
     description = db.Column('description', db.String(1000))
     posts = orm.relationship('Post')
-
-class AssignedTo(db.Model):
-    __tablename__ = 'assignedto'
-    assignment_id = db.Column('assignment_id', db.String(256), db.ForeignKey('projectassignment.assignment_id'), primary_key=True)
-    section_id = db.Column('section_id', db.Integer(), db.ForeignKey('section.section_id'), primary_key=True)
-    assignments = orm.relationship('ProjectAssignment')     
-
-class Post(db.Model):
-    __tablename__ = 'post'
-    assignment_id = db.Column('assignment_id', db.Integer(), db.ForeignKey('projectassignment.assignment_id'), primary_key=True) 
-    time_posted = db.Column('time_posted', db.String(), primary_key=True)
-    message = db.Column('message', db.String(1000))
+    @staticmethod
+    def addNew(sections, max_mem, assigned, due, desc):
+        try:
+            a_id = db.session.query(ProjectAssignment).count()+1
+            db.session.execute('INSERT INTO projectassignment VALUES(:assignment_id, :max_members, :date_assigned, :date_due, :description)',
+            dict(assignment_id=a_id, max_members=max_mem, date_assigned=assigned, date_due=due, description=desc))
+            for section in sections:
+                db.session.execute('INSERT INTO assignedto VALUES(:assignment_id, :section_id)',
+                                   dict(assignment_id=a_id, section_id=int(section)))
+            db.session.commit()
+        except Exception as e:
+            db.session.rollback()
+            raise e
 
 class NeedTeamPost(db.Model):
     __tablename__ = 'needteampost'

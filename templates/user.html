@@ -13,37 +13,48 @@
 <p>Graduation Year: {{user.grad_year}}</p>
 {% endif %}
 
-{% if isStudent %}
-<h2>My Groups:</h2>
-{% if groups|length > 0 %}
-<ul>
-{% for group in groups %}<li><a href="{{url_for('membersOf', g_id=group.g_id)}}">{{group.group_name}}</a></li>{% endfor %}
-</ul>
-{% else %}
-<p>You are not in any groups!</p>
-{% endif %}
-{% endif %}
-
-<h2>My Classes:</h2>
-{% if classes|length > 0 %}
-<ul>
-{% for classThing in classes %}
-<li>Class: {{classThing.course_pre}} {{classThing.course_code}} {{classThing.course_name}}</li>
-<p>Section: {{classThing.section_number}}</p>
-<p>Semester: {{classThing.course_semester}}</p>
-<p>@ {{classThing.university_name}}</p>
-{% if isStudent %}
-<a href="{{url_for('new_group', sectionid=classThing.section_id)}}">Add Group</a>
-{% endif %}
-{% endfor %}
-</ul>
-{% else %}
-<p>You have not added any classes!</p>
-{% endif %}
+<div class="listings">
+	{% if isStudent %}
+	<div class="my_groups">
+		<h2>My Groups:</h2>
+		{% if groups|length > 0 %}
+		<ul>
+		{% for group in groups %}
+		<div class="group"><li><a href="{{url_for('membersOf', g_id=group.g_id)}}">{{group.group_name}}</a></li></div>
+		{% endfor %}
+		</ul>
+		{% else %}
+		<p>You are not in any groups!</p>
+		{% endif %}
+		{% endif %}
+	</div>
+	<div class="my_classes">
+		<h2>My Classes:</h2>
+		{% if classes|length > 0 %}
+		<ul>
+		{% for classThing in classes %}
+		<div class="course">
+		<li>Class: {{classThing.course_pre}} {{classThing.course_code}} {{classThing.course_name}}</li>
+		<p>Section: {{classThing.section_number}}</p>
+		<p>Semester: {{classThing.course_semester}}</p>
+		<p>@ {{classThing.university_name}}</p>
+		{% if isStudent %}
+		<p><a href="{{url_for('classfeed', id=classThing.section_id)}}"> See Posts, Meet Mates!</a></p>
+		<a href="{{url_for('new_group', sectionid=classThing.section_id)}}">Add Group</a>
+		{% endif %}
+		<br></br>
+		</div>
+		{% endfor %}
+		</ul>
+		{% else %}
+		<p>You have not added any classes!</p>
+		{% endif %}
+	</div>
+</div>
 {% if isStudent %}
 <p>Register for a class <a href="/register-class">here</a>!</p>
 {% else %}
-<p>Create a new class <a href="/create-class">here</a>!</p>
-<p>Add a new assignment <a href="/new-assignment">here</a>!</p>
+<p>Create a class <a href="/create-class">here</a>!</p>
+<p>Create a new assignment <a href="/new-assignment">here</a>!</p>
 {% endif %}
 {% endblock %}

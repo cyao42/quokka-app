@@ -1,4 +1,4 @@
-from flask import Flask, render_template, redirect, url_for
+from flask import Flask, render_template, redirect, url_for, request
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import and_
 import models
@@ -176,15 +176,22 @@ def register_user():
     else:
         return render_template('register.html', form=form)
 
-@app.route('/classfeed/<id>')
+@app.route('/feed/<id>')
 def classfeed(id):
-    course = db.session.query(models.Course)\
-       .filter(models.Class.id == id).one()
-    #assignments = models.Course.getAssignments(course.course_code)
-    
-    return render_template('classfeed.html', course=course)
+    section = db.session.query(models.Section)\
+        .filter(models.Section.section_id == id).one()
+    course_code = section.course_code
+    assignments = db.session.query(models.ProjectAssignment)\
+                    .join(models.AssignedTo)\
+                    .join(models.Section)\
+                    .filter(models.Section.section_id == id)
+    return render_template('classfeed.html', section = section, assignments = assignments)
 
-def getPosts(assignment): 
+@app.route('/classfeed/', methods=['GET', 'POST'])
+def getPosts(): 
+    assignment_id = request.form.get('selected_assignment')
+    assignment = db.session.query(models.ProjectAssignment)\
+        .filter(models.ProjectAssignment.assignment_id == assignment_id).one()
     posts = assignment.posts
     return render_template('classfeed-posts.html', posts=posts, assignment=assignment)
 
@@ -203,11 +210,7 @@ def new_assignment():
         print "VALIDATED!!!"
         try:
             form.errors.pop('database', None)
-            selected = form.get_sections()
-            for s in selected:
-                print "SECTION:"
-                print s
-            #add assignment to database
+            models.ProjectAssignment.addNew(form.get_sections(), form.max_members.data, form.date_assigned.data, form.date_due.data, form.description.data)
             return redirect('/profile')
         except BaseException as e:
             form.errors['database'] = str(e)
