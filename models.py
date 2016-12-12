@@ -107,7 +107,6 @@ class RegisteredWith(db.Model):
             db.session.rollback()
             raise e
 
-
 class Add(db.Model):
     __tablename__ = 'join'
     j_id = db.Column('j_id', db.Integer(), primary_key=True)
