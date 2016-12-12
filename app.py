@@ -318,7 +318,7 @@ def respond_post(id):
                 if group_from:
                     models.GroupResponse.addNew(post.post_id, group_from.g_id, post.section_id, form.message.data)
                 else:
-                    models.UserResponse.addNew(post.post_id, currentuser.u_id, post.section_id, form.message.data)
+                    models.UserResponse.addNew(post.post_id, user_from.u_id, post.section_id, form.message.data)
                 return redirect(url_for('classfeed', id=post.assignment_id))
             except BaseException as e:
                 form.errors['database'] = str(e)
@@ -360,6 +360,8 @@ def inbox():
             key = str(u_r.post_id)+" "+str(u_r.u_id)
             if request.form[key] == 'Accept':
                 print request.form["group_name"]
+                print currentuser.u_id
+                print u_r.u_id
                 models.Groups.addNewTwoUsers(request.form["group_name"], u_r.section_id, u_r.assignment_id, currentuser.u_id, u_r.u_id)
             elif request.form[key] == 'Reject':
                 print "CALL REJECT"
