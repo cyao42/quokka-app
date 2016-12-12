@@ -73,12 +73,40 @@ class Groups(db.Model):
         except Exception as e:
             db.session.rollback()
             raise e
+    @staticmethod
+    def addNewTwoUsers(group_name, section_id, assignment_id, user1, user2):
+        try:
+            g_id = db.session.query(Groups).count()+1
+            section_id = int(section_id)
+            db.session.execute('INSERT INTO groups VALUES(:group_name, :g_id)',
+                               dict(group_name=group_name, g_id=g_id))
+            db.session.execute('INSERT INTO projectgroup VALUES(:g_id, :name)',
+                                   dict(g_id=g_id, name=group_name))
+            db.session.execute('INSERT INTO workingon VALUES(:g_id, :assignment_id)',
+                                   dict(g_id=g_id, assignment_id=int(assignment_id)))
+            db.session.execute('INSERT INTO memberof VALUES(:u_id, :g_id, :is_leader)',
+                dict(u_id=user1, g_id=g_id, is_leader='yes'))
+            db.session.execute('INSERT INTO memberof VALUES(:u_id, :g_id, :is_leader)',
+                dict(u_id=user2, g_id=g_id, is_leader='no'))
+            db.session.commit()
+        except Exception as e:
+            db.session.rollback()
+            raise e
 
 class MemberOf(db.Model):
     __tablename__ = 'memberof'
     u_id = db.Column('u_id', db.Integer(), db.ForeignKey('users.u_id'), primary_key=True)
     g_id = db.Column('g_id', db.Integer(), db.ForeignKey('groups.g_id'), primary_key=True)
     is_leader = db.Column('is_leader', db.String(3))
+    @staticmethod
+    def addNew(u_id, g_id):
+        try:
+            db.session.execute('INSERT INTO memberof VALUES(:u_id, :g_id, :is_leader)',
+                               dict(u_id=u_id, g_id=g_id, is_leader='no'))
+            db.session.commit()
+        except Exception as e:
+            db.session.rollback()
+            raise e
 
 class University(db.Model):
     __tablename__ = 'university'
@@ -197,7 +225,7 @@ class GroupResponse(db.Model):
     __tablename__ = 'groupresponse'
     post_id = db.Column('post_id', db.Integer(), db.ForeignKey('post.post_id'), primary_key=True)
     g_id = db.Column('g_id', db.Integer(), db.ForeignKey('groups.g_id'), primary_key=True)
-    section_id = db.Column('section_id', db.Integer(), db.ForeignKey('section.section_id'), primary_key=True)
+    section_id = db.Column('section_id', db.Integer(), db.ForeignKey('section.section_id'))
     time_posted = db.Column('time_posted', db.String(100))
     message = db.Column('message', db.String(1000))
     approved = db.Column('approved', db.Boolean())
@@ -216,7 +244,7 @@ class UserResponse(db.Model):
     __tablename__ = 'userresponse'
     post_id = db.Column('post_id', db.Integer(), db.ForeignKey('post.post_id'), primary_key=True)
     u_id = db.Column('u_id', db.Integer(), db.ForeignKey('users.u_id'), primary_key=True)
-    section_id = db.Column('section_id', db.Integer(), db.ForeignKey('section.section_id'), primary_key=True)
+    section_id = db.Column('section_id', db.Integer(), db.ForeignKey('section.section_id'))
     time_posted = db.Column('time_posted', db.String())
     message = db.Column('message', db.String(1000))
     approved = db.Column('approved', db.Boolean())

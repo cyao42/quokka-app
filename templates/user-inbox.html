@@ -1,8 +1,33 @@
 {% extends 'layout.html' %}
 {% block heading %}Inbox: {% endblock %}
 {% block content %}
-{% for response in responses %}
-<p>From:  {{user_from}} {% if group_from %}from {{group_from.group_name}}{% endif %}</p>
+<h3>User Responses:</h3>
+{% if user_responses|length == 0 %}
+<p>You do not have any responses from users!</p>
+{% endif %}
+
+<p>Create a new group with a user by typing in a group name and clicking 'Accept'!</p>
+{% for response in user_responses %}
+<p><b>Assignment:</b> {{response.description}}</p>
+<p><b>From User:</b> {{response.name}}</p>
+<p><b>Time:</b> {{response.time_posted}}</p>
+<p><b>Message:</b> {{response.message}}</p>
+<form action="/my_inbox" method="POST">
+<input type="text" name="group_name">
+<input type="submit" name="{{response.post_id}} {{response.u_id}}" value="Accept">
+<input type="submit" name="{{response.post_id}} {{response.u_id}}" value="Reject">
+</form>
 {% endfor %}
 
+<h3>Group Responses:</h3>
+{% if group_responses|length == 0 %}
+<p>You do not have any responses from groups!</p>
+{% endif %}
+
+{% for response in group_responses %}
+<p><b>Assignment:</b> {{response.description}}</p>
+<p><b>From Group:</b> {{response.group_name}}</p>
+<p><b>Time:</b> {{response.time_posted}}</p>
+<p><b>Message:</b> {{response.message}}</p>
+{% endfor %}
 {% endblock %}
