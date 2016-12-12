@@ -42,7 +42,7 @@
 		<p>@ {{classThing.university_name}}</p>
 		{% for assign in assignments %}
 			{% if assign.section_id == classThing.section_id %}
-			<li>Assignment: Id-{{assign.assignment_id}} Due-{{assign.date_due}}</li> 
+			<li>Assignment: (Id) {{assign.assignment_id}} (Due) {{assign.date_due}} => {{assign.description}}</li> 
 			{% endif %}
 		{% endfor %}
 		{% if isStudent %}
