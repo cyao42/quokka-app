@@ -1,4 +1,4 @@
-Bfrom flask import Flask, render_template, redirect, url_for, request
+from flask import Flask, render_template, redirect, url_for, request
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import and_
 import models
@@ -319,7 +319,7 @@ def respond_post(id):
                     models.GroupResponse.addNew(post.post_id, group_from.g_id, post.section_id, form.message.data)
                 else:
                     models.UserResponse.addNew(post.post_id, currentuser.u_id, post.section_id, form.message.data)
-                return redirect(url_for('classfeed', id=post.assignment_id))
+                return redirect(url_for('/profile'))
             except BaseException as e:
                 form.errors['database'] = str(e)
                 return render_template('response.html', form=form, user_from=currentuser.name, user_to=user_to.name, group_from=group_from, group_to=group_to, id=id, assignment=assignment)
