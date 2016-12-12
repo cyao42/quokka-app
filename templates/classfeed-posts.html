@@ -7,7 +7,8 @@
   <body>
 <img src="/static/img/quokka.PNG"/>
     <div id="header">
-      <h1>Posts for Class</h1>
+      <h1>Posts for: {{course.course_name}} Section {{section_number}} </h1>
+      <p>{{assignment.description}}</p>
     <ul id="top">
     <li class="filter">Filter</li>
     <li class="post">AddPost</li>
@@ -17,15 +18,18 @@
     <div>
       <div id="request">
       <ul id="need">
-      <li class="need">NeedTeam</li>
-      <li class="need">NeedMembers</li>
+      <li class="need"><a href="{{url_for('getAllPosts', course_code = course.course_code, section_number = section_number, assignment_id = assignment.assignment_id)}}" method="POST">All posts</a>
+      <li class="need"><a href="{{url_for('getNeedMemberPosts', course_code = course.course_code, section_number = section_number, assignment_id = assignment.assignment_id)}}" method="POST">I Need A Team</a></li>
+      <li class="need"><a href="{{url_for('getNeedTeamPosts', course_code = course.course_code, section_number = section_number, assignment_id = assignment.assignment_id)}}" method="POST">I Need Members</a>
+      </li>
       </ul>
       </div>
       <br></br>
       {% for post in posts %}
       <div id="post">
         <h6>{{post.time_posted}}</h6>
-        <p>{{post.message}}</p>
+        <h3>{{post.u_id}} {{post.post_type}} </h3>
+        <h4>{{post.message}}</h4>
       </div>
       {% endfor %}
     </div>	
