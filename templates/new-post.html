@@ -1,0 +1,25 @@
+{% extends 'layout.html' %}
+{% block heading %}Create A Post! {% endblock %}
+{% block content %}
+<head>
+  <link type="text/css" rel="stylesheet" href="/static/css/style.css"/>
+</head>
+<form action="/create-post" method="POST">
+  {{form.csrf_token}}
+  <p>
+    Write a message: {{form.message(cols="35",rows="20")}}
+    {% if form.message.errors %}
+    <ul>{% for error in form.messsage.errors %}<li>{{error}}</li>{% endfor %}</ul>
+    {% endif %}
+  </p>
+  <p>
+    What are you looking for? {{form.looking_for}}
+    {% if form.looking_for.errors %}
+    <ul>{% for error in form.looking_for.errors %}<li>{{error}}</li>{% endfor %}</ul>
+    {% endif %}
+  </p>
+ <input type="reset" value="Reset"/>
+ <input type="submit" value="Submit"/>
+  {% if 'database' in form.errors %}<p>{{form.errors['database']}}</p>{% endif %}
+</form>
+{% endblock %}

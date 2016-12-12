@@ -84,6 +84,23 @@ def user():
     else:
         return redirect('/')
 
+@app.route('/create-post')
+def createpost():
+    global currentuser
+    if not currentuser:
+        return redirect('/')
+
+    form = forms.PostNewFormFactory.form()
+    if form.validate_on_submit():
+        try:
+            form.errors.pop('database', None)
+            return redirect('/profile')
+        except BaseException as e:
+            form.errors['database'] = str(e)
+            return render_template('new-post.html', form=form)
+    else:
+        return render_template('new-post.html', form=form)
+
 @app.route('/register-class', methods=['GET', 'POST'])
 def register_class():
     global currentuser
