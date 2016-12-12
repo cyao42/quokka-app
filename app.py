@@ -253,11 +253,10 @@ def respond_post(id):
         if form.validate_on_submit():
             try:
                 form.errors.pop('database', None)
-                if group_to:
-                    print "SUCCESS:"
-                    models.GroupResponse.addNew(post.post_id, group_to.g_id, post.section_id, form.message.data)
+                if group_from:
+                    models.GroupResponse.addNew(post.post_id, group_from.g_id, post.section_id, form.message.data)
                 else:
-                    models.UserResponse.addNew(post.post_id, user_to.u_id, post.section_id, form.message.data)
+                    models.UserResponse.addNew(post.post_id, currentuser.u_id, post.section_id, form.message.data)
                 return redirect(url_for('classfeed', id=post.assignment_id))
             except BaseException as e:
                 form.errors['database'] = str(e)
