@@ -25,6 +25,16 @@ class Users(db.Model):
         except Exception as e:
             db.session.rollback()
             raise e
+    @staticmethod
+    def editUser(name, phone, email, u_id):
+        try:
+            db.session.execute('UPDATE users SET name = :name, phone = :phone, email = :email, u_id = :u_id'
+                               ' WHERE u_id = :u_id',
+                               dict(u_id=u_id, name=name, phone=phone, email=email))
+            db.session.commit()
+        except Exception as e:
+            db.session.rollback()
+            raise e
 
 class Professor(db.Model):
     __tablename__ = 'professor'
@@ -33,6 +43,16 @@ class Professor(db.Model):
     phone = db.Column('phone', db.Integer())
     email = db.Column('email', db.String(256))
     password = db.Column('password', db.String(256))
+    @staticmethod
+    def editProf(name, phone, email, u_id):
+        try:
+            db.session.execute('UPDATE professor SET name = :name, phone = :phone, email = :email, u_id = :u_id'
+                               ' WHERE u_id = :u_id',
+                               dict(u_id=u_id, name=name, phone=phone, email=email))
+            db.session.commit()
+        except Exception as e:
+            db.session.rollback()
+            raise e
 
 class Student(db.Model):
     __tablename__ = 'student'
@@ -43,7 +63,17 @@ class Student(db.Model):
     password = db.Column('password', db.String(256))
     first_major = db.Column('first_major', db.String(256))
     second_major = db.Column('second_major', db.String(256))
-    grad_year = db.Column('grad_year', db.Integer())  
+    grad_year = db.Column('grad_year', db.Integer())
+    @staticmethod
+    def editStudent(name, phone, email, u_id, first_major, second_major, grad_year):
+        try:
+            db.session.execute('UPDATE student SET name = :name, phone = :phone, email = :email, first_major = :first_major, second_major = :second_major, grad_year = :grad_year, u_id = :u_id'
+                ' WHERE u_id = :u_id',
+                dict(u_id=u_id, name=name, phone=phone, email=email, first_major=first_major, second_major=second_major, grad_year=grad_year))
+            db.session.commit()
+        except Exception as e:
+            db.session.rollback()
+            raise e
 
 class Groups(db.Model):
     __tablename__ = 'groups'

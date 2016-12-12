@@ -73,7 +73,13 @@ def new_group(sectionid):
 @app.route('/profile')
 def user():
     global currentuser
+    global isStudent
     if(currentuser):
+        currentuser = db.session.query(models.Users)\
+            .filter(models.Users.u_id == currentuser.u_id).first()
+        if isStudent:
+            currentuser = db.session.query(models.Student)\
+                .filter(models.Student.u_id == currentuser.u_id).first()
         groups = db.session.query(models.Groups).\
                  join(models.MemberOf).\
                  filter(models.MemberOf.u_id == currentuser.u_id).all()
@@ -179,10 +185,15 @@ def create_university():
 @app.route('/register-user/', methods=['GET', 'POST'])
 def register_user():
     global currentuser
+    global isStudent
     form = forms.UserRegisterFormFactory.form()
     if form.validate_on_submit():
         try:
             form.errors.pop('database', None)
+            if form.user_type.data == 'pro':
+                isStudent = False
+            else:
+                isStudent = True
             email_check = db.session.query(models.Users)\
                           .filter(models.Users.email == form.email.data).first()
             if(email_check):
@@ -280,6 +291,42 @@ def new_assignment():
             return render_template('new-assignment.html', form=form)
     else:
         return render_template('new-assignment.html', form=form)
+
+@app.route('/edit-profile', methods=['GET', 'POST'])
+def edit_prof():
+    global currentuser
+    global isStudent
+    global user_info
+    if not currentuser:
+        return redirect('/')
+
+    if isStudent:
+        user_info = db.session.query(models.Student)\
+            .filter(models.Student.u_id == currentuser.u_id).first()
+    else:
+        user_info = db.session.query(models.Professor)\
+            .filter(models.Professor.u_id == currentuser.u_id).first()
+    form = forms.EditProfileFormFactory.form(user_info, isStudent)
+    if form.validate_on_submit():
+        try:
+            form.errors.pop('database', None)
+            models.Users.editUser(form.name.data,form.phone.data,form.email.data,currentuser.u_id)
+            if isStudent:
+                models.Student.editStudent(form.name.data,form.phone.data,form.email.data,currentuser.u_id,form.first_major.data,form.second_major.data,form.grad_year.data)
+            else:
+                models.Professor.editProf(form.name.data,form.phone.data,form.email.data,currentuser.u_id)
+            return redirect('/profile')
+        except BaseException as e:
+            form.errors['database'] = str(e)
+            if isStudent:
+                return render_template('edit-profile-student.html', form=form)
+            else:
+                return render_template('edit-profile.html', form=form)
+    else:
+        if isStudent:
+            return render_template('edit-profile-student.html', form=form)
+        else:
+            return render_template('edit-profile.html', form=form)
 
 @app.route('/membersof/<g_id>')
 def membersOf(g_id):

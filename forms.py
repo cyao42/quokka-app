@@ -72,6 +72,19 @@ class PostNewFormFactory:
             looking_for = SelectField('Looking For', choices=options)
         return F()
 
+class EditProfileFormFactory:
+    @staticmethod
+    def form(user_info, isStudent):
+        class F(FlaskForm):
+            name = StringField(default=user_info.name)
+            phone = StringField(default=user_info.phone)
+            email = StringField(default=user_info.email)
+            if isStudent:
+                first_major = StringField(default=user_info.first_major)
+                second_major = StringField(default=user_info.second_major)
+                grad_year = StringField(default=user_info.grad_year)
+        return F()
+
 class AssignmentNewFormFactory:
     @staticmethod
     def form(sections):
