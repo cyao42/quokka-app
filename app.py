@@ -3,6 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import and_
 import models
 import forms
+import datetime
 
 app = Flask(__name__)
 app.secret_key = 's3cr3t'
@@ -83,6 +84,26 @@ def user():
         return render_template('user.html', user=currentuser, isStudent=isStudent, groups=groups, classes=classes)
     else:
         return redirect('/')
+
+@app.route('/create-post/<assignment_id>/<section_id>', methods=['GET', 'POST'])
+def createPost(assignment_id, section_id):
+    global currentuser
+    if not currentuser:
+        return redirect('/')
+    section = db.session.query(models.Section)\
+                .filter(models.Section.section_id == section_id).one()
+    form = forms.PostNewFormFactory.form()
+    if form.validate_on_submit():
+        try:
+            form.errors.pop('database', None)
+            time = str(datetime.datetime.now())
+            models.Post.addNew(assignment_id, section.section_id, currentuser.u_id, form.looking_for.data, form.message.data,time)
+            return redirect(url_for('getAllPosts', section_id=section.section_id, assignment_id = assignment_id))
+        except BaseException as e:
+            form.errors['database'] = str(e)
+            return render_template('new-post.html', form=form, assignment_id=assignment_id, section_id=section_id)
+    else:
+        return render_template('new-post.html', form=form, assignment_id=assignment_id, section_id=section_id)
 
 @app.route('/register-class', methods=['GET', 'POST'])
 def register_class():
@@ -188,13 +209,54 @@ def classfeed(id):
                     .filter(models.Section.section_id == id).all()
     return render_template('classfeed.html', section = section, course = course, assignments = assignments)
 
-@app.route('/classfeed/<course_name>/<section_number>', methods=['GET', 'POST'])
-def getPosts(course_name, section_number): 
-    assignment_id = request.form.get('selected_assignment')
+@app.route('/posts/<section_id>', methods=['GET', 'POST'])
+def getPosts(section_id): 
+    section = db.session.query(models.Section)\
+                .filter(models.Section.section_id==section_id).one()
+    course = db.session.query(models.Course)\
+                .filter(models.Course.course_code == section.course_code).one()
+    assignment_id = request.form.get('selected_assignment')    
     assignment = db.session.query(models.ProjectAssignment)\
-        .filter(models.ProjectAssignment.assignment_id == assignment_id).one()
-    posts = assignment.posts
-    return render_template('classfeed-posts.html', posts=posts, assignment=assignment, course_name = course_name, section_number = section_number)
+                .filter(models.ProjectAssignment.assignment_id == assignment_id).one()
+    posts = db.session.query(models.Post)\
+            .filter(models.Post.section_id==section.section_id, models.Post.assignment_id==assignment_id)
+    return render_template('classfeed-posts.html', posts=posts, assignment=assignment, course=course, section=section)
+
+@app.route('/posts/<section_id>/<assignment_id>/all', methods=['GET', 'POST'])
+def getAllPosts(section_id, assignment_id): 
+    section = db.session.query(models.Section)\
+                .filter(models.Section.section_id==section_id).one()   
+    course = db.session.query(models.Course)\
+                .filter(models.Course.course_code == section.course_code).one()
+    assignment = db.session.query(models.ProjectAssignment)\
+                .filter(models.ProjectAssignment.assignment_id == assignment_id).one()
+    posts = db.session.query(models.Post)\
+            .filter(models.Post.section_id==section.section_id, models.Post.assignment_id==assignment_id)
+    return render_template('classfeed-posts.html', posts=posts, assignment=assignment, course=course, section=section)
+
+@app.route('/posts/<section_id>/<assignment_id>/need_member', methods=['GET', 'POST'])
+def getNeedMemberPosts(section_id, assignment_id): 
+    section = db.session.query(models.Section)\
+                .filter(models.Section.section_id==section_id).one()   
+    course = db.session.query(models.Course)\
+                .filter(models.Course.course_code == section.course_code).one()
+    assignment = db.session.query(models.ProjectAssignment)\
+                .filter(models.ProjectAssignment.assignment_id == assignment_id).one()
+    posts = db.session.query(models.Post)\
+            .filter(models.Post.section_id==section.section_id, models.Post.assignment_id==assignment_id, models.Post.post_type=="need_member")
+    return render_template('classfeed-posts.html', posts=posts, assignment=assignment, course=course, section=section)
+
+@app.route('/posts/<section_id>/<assignment_id>/need_team', methods=['GET', 'POST'])
+def getNeedTeamPosts(section_id, assignment_id): 
+    section = db.session.query(models.Section)\
+                .filter(models.Section.section_id==section_id).one()   
+    course = db.session.query(models.Course)\
+                .filter(models.Course.course_code == section.course_code).one()
+    assignment = db.session.query(models.ProjectAssignment)\
+                .filter(models.ProjectAssignment.assignment_id == assignment_id).one()
+    posts = db.session.query(models.Post)\
+            .filter(models.Post.section_id==section.section_id, models.Post.assignment_id==assignment_id, models.Post.post_type=="need_team")
+    return render_template('classfeed-posts.html', posts=posts, assignment=assignment, course=course, section=section)
 
 @app.route('/new-assignment', methods=['GET', 'POST'])
 def new_assignment():

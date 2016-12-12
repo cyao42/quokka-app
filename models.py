@@ -122,16 +122,18 @@ class Post(db.Model):
     post_type = db.Column('post_type', db.String(100))
     message = db.Column('message', db.String(1000))
     time_posted = db.Column('time_posted', db.String())
-
-class NeedTeamPost(db.Model):
-    __tablename__ = 'needteampost'
-    assignment_id = db.Column('assignment_id', db.Integer(), db.ForeignKey('projectassignment.assignment_id'), primary_key=True)   
-      
-
-class NeedMemberPost(db.Model):
-    __tablename__ = 'needmemberpost'
-    assignment_id = db.Column('assignment_id', db.Integer(), db.ForeignKey('projectassignment.assignment_id'), primary_key=True)   
-    g_id = db.Column('g_id', db.Integer(), db.ForeignKey('groups.g_id'), primary_key=True)
+    @staticmethod
+    def addNew(assignment_id, section_id, u_id, looking_for, message, time_posted):
+        try:
+            post_id = db.session.query(Post).count()+1
+            post_id = int(post_id)
+            section_id = int(section_id)
+            db.session.execute('INSERT INTO post VALUES(:post_id, :assignment_id, :section_id, :u_id, :post_type, :message, :time_posted)',
+                               dict(post_id = post_id, assignment_id=assignment_id, section_id=section_id,u_id=u_id,post_type=looking_for,message=message,time_posted=time_posted))
+            db.session.commit()
+        except Exception as e:
+            db.session.rollback()
+            raise e
 
 
 class ProjectAssignment(db.Model):
