@@ -2,19 +2,11 @@ body { background-color: Lavender;
 }
 
 h1 {
-        color: WhiteSmoke;
+        color: DarkSlateBlue;
         font-size: 36px;
         font-family: Cooper Black;
         font-weight: bold;
         text-align: center;
-}
-
-#header {
-        background-color: DarkSlateBlue;
-        position: relative;
-        padding: 10px 10px 10px 10px;
-        border-radius: 10px 10px 10px 10px;
-        border:3px outset WhiteSmoke;
 }
 
 .group:before,

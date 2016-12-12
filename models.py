@@ -82,27 +82,16 @@ class MemberOf(db.Model):
 class University(db.Model):
     __tablename__ = 'university'
     university_name = db.Column('university_name', db.String(256), primary_key=True)
-    university_location = db.Column('university_location', db.String(256), primary_key=True)
-
-class Post(db.Model):
-    __tablename__ = 'post'
-    assignment_id = db.Column('assignment_id', db.Integer(), db.ForeignKey('projectassignment.assignment_id'), primary_key=True) 
-    time_posted = db.Column('time_posted', db.String(), primary_key=True)
-    message = db.Column('message', db.String(1000))
-
-class AssignedTo(db.Model):
-    __tablename__ = 'assignedto'
-    assignment_id = db.Column('assignment_id', db.String(256), db.ForeignKey('projectassignment.assignment_id'), primary_key=True)
-    section_id = db.Column('section_id', db.Integer(), db.ForeignKey('section.section_id'), primary_key=True)      
-
-class Course(db.Model):
-    __tablename__ = 'course'
-    course_code = db.Column('course_code', db.String(256), primary_key=True)
-    course_semester = db.Column('course_semester', db.String(10), primary_key=True)
-    university_name = db.Column('university_name', db.String(256), db.ForeignKey('university.university_name'), primary_key=True)
-    university_location = db.Column('university_location', db.String(256), db.ForeignKey('university.university_location'), primary_key=True)
-    course_name = db.Column('course_name', db.String(256))
-    course_pre = db.Column('course_pre', db.String(256))
+    university_location = db.Column('university_location', db.String(256))
+    @staticmethod
+    def addNew(university_name, university_location):
+        try:
+            db.session.execute('INSERT INTO university VALUES(:university_name, :university_location)',
+                               dict(university_name=university_name, university_location=university_location))
+            db.session.commit()
+        except Exception as e:
+            db.session.rollback()
+            raise e
 
 class Section(db.Model):
     __tablename__ = 'section'
@@ -112,6 +101,17 @@ class Section(db.Model):
     course_semester = db.Column('course_semester', db.String(256), db.ForeignKey('course.course_semester'))
     university_name = db.Column('university_name', db.String(256), db.ForeignKey('university.university_name'))
     university_location = db.Column('university_location', db.String(256), db.ForeignKey('university.university_location'))
+    @staticmethod
+    def addNew(course_code, course_semester, university_name, university_location, section_number):
+        try:
+            section_id = db.session.query(Section).count()+1
+            section_number = int(section_number)
+            db.session.execute('INSERT INTO section VALUES(:section_id, :section_number, :course_code, :course_semester, :university_name, :university_location)',
+                               dict(section_id=section_id, section_number=section_number, course_code=course_code, course_semester=course_semester, university_name=university_name, university_location=university_location))
+            db.session.commit()
+        except Exception as e:
+            db.session.rollback()
+            raise e
 
 class RegisteredWith(db.Model):
     __tablename__ = 'registeredwith'
@@ -126,6 +126,7 @@ class RegisteredWith(db.Model):
         except Exception as e:
             db.session.rollback()
             raise e
+
 
 class Add(db.Model):
     __tablename__ = 'join'
@@ -154,19 +155,28 @@ class ProjectAssignment(db.Model):
     date_due = db.Column('date_due', db.String(20))
     description = db.Column('description', db.String(1000))
     posts = orm.relationship('Post')
-    @staticmethod
-    def addNew(sections, max_mem, assigned, due, desc):
-        try:
-            a_id = db.session.query(ProjectAssignment).count()+1
-            db.session.execute('INSERT INTO projectassignment VALUES(:assignment_id, :max_members, :date_assigned, :date_due, :description)',
-            dict(assignment_id=a_id, max_members=max_mem, date_assigned=assigned, date_due=due, description=desc))
-            for section in sections:
-                db.session.execute('INSERT INTO assignedto VALUES(:assignment_id, :section_id)',
-                                   dict(assignment_id=a_id, section_id=int(section)))
-            db.session.commit()
-        except Exception as e:
-            db.session.rollback()
-            raise e
+
+class AssignedTo(db.Model):
+    __tablename__ = 'assignedto'
+    assignment_id = db.Column('assignment_id', db.String(256), db.ForeignKey('projectassignment.assignment_id'), primary_key=True)
+    section_id = db.Column('section_id', db.Integer(), db.ForeignKey('section.section_id'), primary_key=True)
+
+
+class Post(db.Model):
+    __tablename__ = 'post'
+    assignment_id = db.Column('assignment_id', db.Integer(), db.ForeignKey('projectassignment.assignment_id'), primary_key=True) 
+    time_posted = db.Column('time_posted', db.String(), primary_key=True)
+    message = db.Column('message', db.String(1000))
+
+class Course(db.Model):
+    __tablename__ = 'course'
+    course_code = db.Column('course_code', db.String(256), primary_key=True)
+    course_semester = db.Column('course_semester', db.String(10), primary_key=True)
+    university_name = db.Column('university_name', db.String(256), db.ForeignKey('university.university_name'), primary_key=True)
+    university_location = db.Column('university_location', db.String(256), db.ForeignKey('university.university_location'), primary_key=True)
+    course_name = db.Column('course_name', db.String(256))
+    course_pre = db.Column('course_pre', db.String(256))
+    u_id = db.Column('u_id', db.Integer(), db.ForeignKey('Users.u_id'), primary_key=True)     
 
 class NeedTeamPost(db.Model):
     __tablename__ = 'needteampost'
