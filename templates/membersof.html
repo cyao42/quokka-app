@@ -2,23 +2,24 @@
 <html>
   <head>
     <link type="text/css" rel="stylesheet" href="/static/css/membersof.css"/>
+    <title>Members Of</title>
   </head>
   <body>
-<img src="/static/img/quokka.PNG"/>
-      <h1>Members of: TheBestProjectTeamEver</h1>
-    <br></br>
-     <div id="groups">
-        <h3>
-        Tom Fleming
-        </h3>
-        <h3>
-        M.A. Economics
-        </h3>
-     <div id="members">
-     <h2>
-     Profile
-     </h2>
-     </div>
+<a href="/profile"><img src="/static/img/quokka.PNG"/></a>
+      <h1>Members Of: {{group.group_name}}</h1>
+    <br>
+      <h2>{{assign}}</h2>
+     <div class="groups">
+  {% for m in member %}
+  <div class="information">
+  <p>{{m.name}}</p>
+  <p>Email: {{m.email}}</p>
+  <p>Phone: {{m.phone}}</p>
+  <p>Major 1: {{m.first_major}}</p>
+  <p>Major 2: {{m.second_major}}</p>
+  <p>Grad Year: {{m.grad_year}}</p>
+  </div>
+  {% endfor %}
      </div>
   </body>
 </html>

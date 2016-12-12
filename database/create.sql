@@ -38,7 +38,7 @@ CREATE TABLE MemberOf
 );
 
 CREATE TABLE University
-(university_name VARCHAR(265) NOT NULL,
+(university_name VARCHAR(265) NOT NULL UNIQUE,
  university_location VARCHAR(265) NOT NULL,
  PRIMARY KEY (university_name, university_location)
 );
@@ -48,6 +48,8 @@ CREATE TABLE Course
  course_semester VARCHAR(256) NOT NULL,
  university_name VARCHAR(256) NOT NULL,
  university_location VARCHAR(256) NOT NULL,
+ course_name VARCHAR(256) NOT NULL,
+ course_pre VARCHAR(256) NOT NULL,
  PRIMARY KEY (course_code,course_semester,university_name,university_location),
 FOREIGN KEY (university_name, university_location) REFERENCES University (university_name, university_location)
 );
@@ -95,22 +97,13 @@ REFERENCES Section (section_id)
 );
 
 CREATE TABLE Post
-(assignment_id INTEGER NOT NULL REFERENCES ProjectAssignment(assignment_id),
- time_posted VARCHAR(100) NOT NULL,
- message VARCHAR(1000),
- PRIMARY KEY (assignment_id, time_posted)
-);
-
-CREATE TABLE NeedTeamPost
-(assignment_id INTEGER NOT NULL REFERENCES ProjectAssignment(assignment_id),
+(post_id INTEGER NOT NULL PRIMARY KEY,
+ assignment_id INTEGER NOT NULL REFERENCES ProjectAssignment(assignment_id),
+ section_id INTEGER NOT NULL REFERENCES Section(section_id),
  u_id INTEGER NOT NULL REFERENCES Users(u_id),
- PRIMARY KEY (assignment_id, u_id)
-);
-
-CREATE TABLE NeedMemberPost
-(assignment_id INTEGER NOT NULL REFERENCES ProjectAssignment(assignment_id),
- g_id INTEGER NOT NULL REFERENCES Groups(g_id),
- PRIMARY KEY (assignment_id, g_id)
+ post_type VARCHAR(12) NOT NULL CHECK (post_type IN ('need_team', 'need_member')),
+ message VARCHAR(100) NOT NULL,
+ time_posted VARCHAR(100) NOT NULL
 );
 
 CREATE TABLE ProjectGroup
@@ -131,21 +124,28 @@ CREATE TABLE WorkingOn
 
 CREATE TABLE StudyingFor 
 (g_id INTEGER NOT NULL REFERENCES Groups(g_id),
- section_id INTEGER NOT NULL,
+ section_id INTEGER NOT NULL REFERENCES Section(section_id),
  PRIMARY KEY (g_id,section_id),
  FOREIGN KEY (section_id)
  REFERENCES Section(section_id)
 );
 
---List the names and groups of all leaders.--
+CREATE TABLE GroupResponse
+(post_id INTEGER NOT NULL REFERENCES Post(post_id),
+ g_id INTEGER NOT NULL REFERENCES Groups(g_id),
+ section_id INTEGER NOT NULL REFERENCES Section(section_id),
+ time_posted VARCHAR(100) NOT NULL,
+ message VARCHAR(1000),
+ approved BOOLEAN NOT NULL,
+ PRIMARY KEY (post_id, g_id)
+);
 
-SELECT Users.name, group_name FROM Users, Groups, MemberOf
-WHERE MemberOf.u_id = Users.u_id AND MemberOf.g_id = Groups.g_id AND MemberOf.is_leader = 'yes';
-
---List names of all users who have posted that they need a team, but are now part of a group.--
-
-SELECT Users.name FROM Users NATURAL JOIN NeedTeamPost NATURAL JOIN MemberOf NATURAL JOIN Groups;
-
---List the names of all users who are not part of a group.--
-
-SELECT Users.name FROM Users EXCEPT (SELECT Users.name FROM Users NATURAL JOIN MemberOf NATURAL JOIN Groups);
+CREATE TABLE UserResponse
+(post_id INTEGER NOT NULL REFERENCES Post(post_id),
+ u_id INTEGER NOT NULL REFERENCES Users(u_id),
+ section_id INTEGER NOT NULL REFERENCES Section(section_id),
+ time_posted VARCHAR(100) NOT NULL,
+ message VARCHAR(1000),
+ approved BOOLEAN NOT NULL,
+ PRIMARY KEY (post_id, u_id)
+);

@@ -1,0 +1,15 @@
+{% extends 'layout.html' %}
+{% block heading %}Response: {% endblock %}
+{% block content %}
+<p>Assignment:  {{assignment.description}}</p>
+<p>From:  {{user_from}} {% if group_from %}from {{group_from.group_name}}{% endif %}</p>
+<p>To: {{user_to}} {% if group_to %}from {{group_to.group_name}}{% endif %}</p>
+<form action="{{url_for('respond_post', id=id)}}" method="POST">
+  {{form.csrf_token}}
+  <p>
+    Message: {{form.message(rows='40', cols='70')}}
+  </p>
+  <input type="submit" value="Submit"/>
+  {% if 'database' in form.errors %}<p>{{form.errors['database']}}</p>{% endif %}
+</form>
+{% endblock %}
