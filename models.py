@@ -1,6 +1,7 @@
 from sqlalchemy import sql, orm, join
 from sqlalchemy.sql import text 
 from app import db
+import datetime
 
 class Users(db.Model):
     __tablename__ = 'users'
@@ -82,36 +83,65 @@ class MemberOf(db.Model):
 class University(db.Model):
     __tablename__ = 'university'
     university_name = db.Column('university_name', db.String(256), primary_key=True)
-    university_location = db.Column('university_location', db.String(256))
+    university_location = db.Column('university_location', db.String(256), primary_key=True)
+
+class Post(db.Model):
+    __tablename__ = 'post'
+    post_id = db.Column('post_id', db.Integer(), primary_key=True)
+    assignment_id = db.Column('assignment_id', db.Integer(), db.ForeignKey('projectassignment.assignment_id'), primary_key=True) 
+    section_id = db.Column('section_id', db.Integer(), db.ForeignKey('section.section_id'), primary_key=True) 
+    u_id = db.Column('u_id', db.Integer(), db.ForeignKey('users.u_id'))
+    post_type = db.Column('post_type', db.String(100))
+    message = db.Column('message', db.String(1000))
+    time_posted = db.Column('time_posted', db.String())
     @staticmethod
-    def addNew(university_name, university_location):
+    def addNew(assignment_id, section_id, u_id, looking_for, message, time_posted):
         try:
-            db.session.execute('INSERT INTO university VALUES(:university_name, :university_location)',
-                               dict(university_name=university_name, university_location=university_location))
+            post_id = db.session.query(Post).count()+1
+            post_id = int(post_id)
+            section_id = int(section_id)
+            db.session.execute('INSERT INTO post VALUES(:post_id, :assignment_id, :section_id, :u_id, :post_type, :message, :time_posted)',
+                               dict(post_id = post_id, assignment_id=assignment_id, section_id=section_id,u_id=u_id,post_type=looking_for,message=message,time_posted=time_posted))
             db.session.commit()
         except Exception as e:
             db.session.rollback()
             raise e
 
+<<<<<<< HEAD
+=======
+
+class ProjectAssignment(db.Model):
+    __tablename__ = 'projectassignment'
+    assignment_id = db.Column('assignment_id', db.Integer(), primary_key=True)
+    max_members = db.Column('max_members', db.Integer())
+    date_assigned = db.Column('date_assigned', db.String(20))
+    date_due = db.Column('date_due', db.String(20))
+    description = db.Column('description', db.String(1000))
+    posts = orm.relationship('Post')
+
+class AssignedTo(db.Model):
+    __tablename__ = 'assignedto'
+    assignment_id = db.Column('assignment_id', db.String(256), db.ForeignKey('projectassignment.assignment_id'), primary_key=True)
+    section_id = db.Column('section_id', db.Integer(), db.ForeignKey('section.section_id'), primary_key=True)      
+
+class Course(db.Model):
+    __tablename__ = 'course'
+    course_code = db.Column('course_code', db.String(256), primary_key=True)
+    course_semester = db.Column('course_semester', db.String(10), primary_key=True)
+    university_name = db.Column('university_name', db.String(256), db.ForeignKey('university.university_name'), primary_key=True)
+    university_location = db.Column('university_location', db.String(256), db.ForeignKey('university.university_location'), primary_key=True)
+    course_name = db.Column('course_name', db.String(256))
+    course_pre = db.Column('course_pre', db.String(256))
+
+>>>>>>> d9c34c9e977119145ed033e506b0a4139165c8ef
 class Section(db.Model):
     __tablename__ = 'section'
     section_id = db.Column('section_id', db.Integer(), primary_key=True)
     section_number = db.Column('section_number', db.Integer())
-    course_code = db.Column('course_code', db.String(256), db.ForeignKey('course.course_code'))
-    course_semester = db.Column('course_semester', db.String(256), db.ForeignKey('course.course_semester'))
-    university_name = db.Column('university_name', db.String(256), db.ForeignKey('university.university_name'))
-    university_location = db.Column('university_location', db.String(256), db.ForeignKey('university.university_location'))
-    @staticmethod
-    def addNew(course_code, course_semester, university_name, university_location, section_number):
-        try:
-            section_id = db.session.query(Section).count()+1
-            section_number = int(section_number)
-            db.session.execute('INSERT INTO section VALUES(:section_id, :section_number, :course_code, :course_semester, :university_name, :university_location)',
-                               dict(section_id=section_id, section_number=section_number, course_code=course_code, course_semester=course_semester, university_name=university_name, university_location=university_location))
-            db.session.commit()
-        except Exception as e:
-            db.session.rollback()
-            raise e
+    course_code = db.Column('course_code', db.String(256), db.ForeignKey('course.course_code'), primary_key=True)
+    course_semester = db.Column('course_semester', db.String(256), db.ForeignKey('course.course_semester'), primary_key=True)
+    university_name = db.Column('university_name', db.String(256), db.ForeignKey('university.university_name'), primary_key=True)
+    university_location = db.Column('university_location', db.String(256), db.ForeignKey('university.university_location'), primary_key=True)
 
 class RegisteredWith(db.Model):
     __tablename__ = 'registeredwith'
@@ -145,6 +175,7 @@ class SentTo(db.Model):
 class SentBy(db.Model):
     __tablename__ = 'sentby'
     j_id = db.Column('j_id', db.Integer(), db.ForeignKey('join.j_id'), primary_key=True)    
+<<<<<<< HEAD
     u_id = db.Column('u_id', db.Integer(), db.ForeignKey('Users.u_id'), primary_key=True)    
     
 class ProjectAssignment(db.Model):
@@ -187,6 +218,9 @@ class NeedMemberPost(db.Model):
     __tablename__ = 'needmemberpost'
     assignment_id = db.Column('assignment_id', db.Integer(), db.ForeignKey('projectassignment.assignment_id'), primary_key=True)   
     g_id = db.Column('g_id', db.Integer(), db.ForeignKey('groups.g_id'), primary_key=True)
+=======
+    u_id = db.Column('u_id', db.Integer(), db.ForeignKey('Users.u_id'), primary_key=True)     
+>>>>>>> d9c34c9e977119145ed033e506b0a4139165c8ef
 
 class ProjectGroup(db.Model):
     __tablename__ = 'projectgroup'
@@ -207,3 +241,42 @@ class StudyingFor(db.Model):
     __tablename__ = 'studyingfor'
     g_id = db.Column('g_id', db.Integer(), db.ForeignKey('groups.g_id'), primary_key=True)
     section_id = db.Column('section_id', db.Integer(), db.ForeignKey('section.section_id'), primary_key=True)
+
+class GroupResponse(db.Model):
+    __tablename__ = 'groupresponse'
+    post_id = db.Column('post_id', db.Integer(), db.ForeignKey('post.post_id'), primary_key=True)
+    g_id = db.Column('g_id', db.Integer(), db.ForeignKey('groups.g_id'), primary_key=True)
+    section_id = db.Column('section_id', db.Integer(), db.ForeignKey('section.section_id'), primary_key=True)
+    time_posted = db.Column('time_posted', db.String(100))
+    message = db.Column('message', db.String(1000))
+    approved = db.Column('approved', db.Boolean())
+    @staticmethod
+    def addNew(post_id, g_id, section_id, message):
+        try:
+            time = str(datetime.datetime.now())
+            db.session.execute('INSERT INTO groupresponse VALUES(:post_id, :g_id, :section_id, :time_posted, :message, :approved)',
+                               dict(post_id=post_id, g_id=g_id, section_id=section_id, time_posted=time, message=message, approved=False))
+            db.session.commit()
+        except Exception as e:
+            db.session.rollback()
+            raise e
+
+class UserResponse(db.Model):
+    __tablename__ = 'userresponse'
+    post_id = db.Column('post_id', db.Integer(), db.ForeignKey('post.post_id'), primary_key=True)
+    u_id = db.Column('u_id', db.Integer(), db.ForeignKey('users.u_id'), primary_key=True)
+    section_id = db.Column('section_id', db.Integer(), db.ForeignKey('section.section_id'), primary_key=True)
+    time_posted = db.Column('time_posted', db.String())
+    message = db.Column('message', db.String(1000))
+    approved = db.Column('approved', db.Boolean())
+    @staticmethod
+    def addNew(post_id, u_id, section_id, message):
+        try:
+            time = str(datetime.datetime.now())
+            db.session.execute('INSERT INTO userresponse VALUES(:post_id, :u_id, :section_id, :time_posted, :m\
+essage, :approved)',
+                               dict(post_id=post_id, u_id=u_id, section_id=section_id, time_posted=time, message=message, approved=False))
+            db.session.commit()
+        except Exception as e:
+            db.session.rollback()
+            raise e

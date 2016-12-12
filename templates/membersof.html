@@ -5,15 +5,19 @@
     <title>Members Of</title>
   </head>
   <body>
-<img src="/static/img/quokka.PNG"/>
+<a href="/profile"><img src="/static/img/quokka.PNG"/></a>
       <h1>Members Of: {{group.group_name}}</h1>
-    <br></br>
+    <br>
      <div class="groups">
   {% for m in member %}
-  <section>
-  <h3>{{m.name}}</h3>
-  <h3>{{m.first_major}}</h3>
-  </section>
+  <div class="information">
+  <p>{{m.name}}</p>
+  <p>Email: {{m.email}}</p>
+  <p>Phone: {{m.phone}}</p>
+  <p>Major 1: {{m.first_major}}</p>
+  <p>Major 2: {{m.second_major}}</p>
+  <p>Grad Year: {{m.grad_year}}</p>
+  </div>
   {% endfor %}
      </div>
   </body>
