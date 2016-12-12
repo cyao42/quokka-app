@@ -158,18 +158,60 @@ def new_assignment():
             .join(models.RegisteredWith)\
             .filter(models.RegisteredWith.u_id == currentuser.u_id)
     form = forms.AssignmentNewFormFactory.form(sections)
-    print "IS FORM VALIDATED?"
     if form.validate_on_submit():
-        print "VALIDATED!!!"
         try:
             form.errors.pop('database', None)
-            models.ProjectAssignment.addNew(form.get_sections(), form.max_members.data, form.date_assigned.data, form.date_due.data, form.description.data)
+            models.ProjectAssignment.addNew(form.get_sections(),form.max_members.data,form.date_assigned.data,form.date_due.data,form.description.data)
             return redirect('/profile')
         except BaseException as e:
             form.errors['database'] = str(e)
             return render_template('new-assignment.html', form=form)
     else:
         return render_template('new-assignment.html', form=form)
+
+@app.route('/respond/<id>', methods=['GET', 'POST'])
+def respond_post(id):
+    global currentuser
+    #check for if person is logged in
+    if not currentuser:
+        return redirect('/')
+    post = db.session.query(models.Post)\
+              .filter(models.Post.post_id == id)
+    isRegistered = db.session.query(models.RegisteredWith)\
+                   .filter(models.RegisteredWith.section_id == post.section_id and models.RegisteredWith.u_id == currentuser.u_id)
+    # if not in class, redirect to profile
+    if not isRegistered:
+        return redirect('/profile')
+    else:
+        # if user in group, find it
+        group_from = db.session.query(models.Groups)\
+                .join(models.MemberOf)\
+                .join(models.AssignedTo)\
+                .filter(models.AssignedTo.assignment_id == post.assignment_id and models.MemberOf.u_id == currentuser.u_id)
+        user_to = db.session.query(models.Users)\
+                    .filter(models.Users.u_id == post.u_id)
+        group_to = None
+        if post.type == 'need_member':
+            group_to = db.session.query(models.Groups)\
+                       .join(models.MemberOf)\
+                       .join(models.AssignedTo)\
+                       .filter(models.AssignedTo.assignment_id == post.assignment_id and models.MemberOf.u_id == post.u_id)
+
+        form = forms.ResponseFormFactory();
+        if form.validate_on_submit():
+            try:
+                form.errors.pop('database', None)
+                if group_to:
+                    models.GroupResponse.addNew(post.post_id, group_to.g_id, post.section_id, form.message.data)
+                else:
+                    models.UserResponse.addNew(post.post_id, user_to.u_id, post.section_id, form.message.data)
+                # models.ProjectAssignment.addNew(form.get_sections(), form.max_members.data, form.date_assigned.data, form.date_due.data, form.description.data)
+                return redirect(url_for('classfeed', id=post.assignment_id))
+            except BaseException as e:
+                form.errors['database'] = str(e)
+                return render_template('response.html', form=form, user_from=currentuser.name, user_to=user_to.name, group_from=group_from.group_name, group_to=group_to)
+        else:
+            return render_template('response.html', form=form, user_from=currentuser.name, user_to=user_to.name, group_from=group_from.group_name, group_to=group_to)
 
 
 @app.template_filter('pluralize')

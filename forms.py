@@ -64,3 +64,8 @@ class AssignmentNewFormFactory:
             setattr(F, field_name, BooleanField(default=default))
         return F()
 
+class ResponseFormFactory:
+    @staticmethod
+    def form():
+        message = TextAreaField()
+        return F()

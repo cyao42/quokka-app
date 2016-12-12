@@ -1,0 +1,15 @@
+{% extends 'layout.html' %}
+{% block heading %}Response: {% endblock %}
+{% block content %}
+<p>Assignment:  {{assignment.description}}</p>
+<p>From:  {{user_from.name}} {% if group_from %}from {{group_from}}{% endif %}</p>
+<p>To: {{user_to}} {% if group_to %}{{group_to.group_name}}{% endif %}</p>
+<form action="/register-class" method="POST">
+  {{form.csrf_token}}
+  <p>
+    Message: {{form.message(rows='50', cols='100')}}
+  </p>
+  <input type="submit" value="Submit"/>
+  {% if 'database' in form.errors %}<p>{{form.errors['database']}}</p>{% endif %}
+</form>
+{% endblock %}
