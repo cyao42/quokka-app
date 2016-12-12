@@ -107,6 +107,54 @@ def register_class():
     else:
         return render_template('register-class.html', form=form)
 
+@app.route('/create-class', methods=['GET', 'POST'])
+def create_class():
+    global currentuser
+    if not currentuser:
+        return redirect('/')
+    
+    universities = db.session.query(models.University).all()
+    form = forms.ClassCreateFormFactory.form(universities)
+    if form.validate_on_submit():
+        try:
+            form.errors.pop('database', None)
+            university = db.session.query(models.University)\
+                .filter(models.University.university_name == form.university.data).first()
+            if university:
+                models.Course.addNew(form.course_code.data,form.course_semester.data,university.university_name,university.university_location,form.course_name.data,form.course_pre.data)
+                startSect = db.session.query(models.Section).count()+1
+                for x in xrange(1,form.num_sect.data+1):
+                    models.Section.addNew(form.course_code.data,form.course_semester.data,university.university_name,university.university_location,x)
+                endSect = db.session.query(models.Section).count()
+                for s in xrange(startSect,endSect+1):
+                    models.RegisteredWith.addNew(currentuser.u_id, s)
+                return redirect('/profile')
+            else:
+                return render_template('create-class.html', form=form)
+        except BaseException as e:
+            form.errors['database'] = str(e)
+            return render_template('create-class.html', form=form)
+    else:
+        return render_template('create-class.html', form=form)
+
+@app.route('/create-university', methods=['GET', 'POST'])
+def create_university():
+    global currentuser
+    if not currentuser:
+        return redirect('/')
+    
+    form = forms.UniversityCreateFormFactory.form()
+    if form.validate_on_submit():
+        try:
+            form.errors.pop('database', None)
+            models.University.addNew(form.u_name.data,form.u_loc.data)
+            return redirect('/create-class')
+        except BaseException as e:
+            form.errors['database'] = str(e)
+            return render_template('create-university.html', form=form)
+    else:
+        return render_template('create-university.html', form=form)
+
 @app.route('/register-user/', methods=['GET', 'POST'])
 def register_user():
     global currentuser
@@ -119,8 +167,7 @@ def register_user():
             if(email_check):
                 return render_template('register.html', form=form, msg="User with that email already exists")
             else:
-                models.Users.addNew(form.name.data, form.phone.data, form.email.data, form.user_type.data, form.password\
-.data)
+                models.Users.addNew(form.name.data, form.phone.data, form.email.data, form.user_type.data, form.password.data)
                 currentuser = db.session.query(models.Users).filter(models.Users.email == form.email.data).first()
                 return redirect('/profile')
         except BaseException as e:
