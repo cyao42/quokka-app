@@ -142,7 +142,7 @@ CREATE TABLE GroupResponse
 
 CREATE TABLE UserResponse
 (post_id INTEGER NOT NULL REFERENCES Post(post_id),
- u_id INTEGER NOT NULL REFERENCES Groups(g_id),
+ u_id INTEGER NOT NULL REFERENCES Users(u_id),
  section_id INTEGER NOT NULL REFERENCES Section(section_id),
  time_posted VARCHAR(100) NOT NULL,
  message VARCHAR(1000),

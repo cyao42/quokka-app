@@ -3,14 +3,6 @@
 {% block content %}
 {% for response in responses %}
 <p>From:  {{user_from}} {% if group_from %}from {{group_from.group_name}}{% endif %}</p>
+{% endfor %}
 
-
-<form action="{{url_for('respond_post', id=id)}}" method="POST">
-  {{form.csrf_token}}
-  <p>
-    Message: {{form.message(rows='40', cols='70')}}
-  </p>
-  <input type="submit" value="Submit"/>
-  {% if 'database' in form.errors %}<p>{{form.errors['database']}}</p>{% endif %}
-</form>
 {% endblock %}

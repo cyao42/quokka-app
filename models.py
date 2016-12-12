@@ -213,7 +213,7 @@ class GroupResponse(db.Model):
 class UserResponse(db.Model):
     __tablename__ = 'userresponse'
     post_id = db.Column('post_id', db.Integer(), db.ForeignKey('post.post_id'), primary_key=True)
-    u_id = db.Column('g_id', db.Integer(), db.ForeignKey('users.u_id'), primary_key=True)
+    u_id = db.Column('u_id', db.Integer(), db.ForeignKey('users.u_id'), primary_key=True)
     section_id = db.Column('section_id', db.Integer(), db.ForeignKey('section.section_id'), primary_key=True)
     time_posted = db.Column('time_posted', db.String())
     message = db.Column('message', db.String(1000))
@@ -222,7 +222,7 @@ class UserResponse(db.Model):
     def addNew(post_id, u_id, section_id, message):
         try:
             time = str(datetime.datetime.now())
-            db.session.execute('INSERT INTO groupresponse VALUES(:post_id, :u_id, :section_id, :time_posted, :m\
+            db.session.execute('INSERT INTO userresponse VALUES(:post_id, :u_id, :section_id, :time_posted, :m\
 essage, :approved)',
                                dict(post_id=post_id, u_id=u_id, section_id=section_id, time_posted=time, message=message, approved=False))
             db.session.commit()

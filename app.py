@@ -273,6 +273,35 @@ def membersOf(g_id):
             .filter(models.Groups.g_id == g_id).first()
     return render_template('membersof.html', member=member, group=group)
 
+@app.route('/my_inbox/')
+def inbox():
+    user_responses = db.session.query(models.UserResponse, models.ProjectAssignment.description, models.Users.name, models.UserResponse.message)\
+                     .join(models.Post)\
+                     .join(models.Users, models.Users.u_id == models.UserResponse.u_id)\
+                     .join(models.ProjectAssignment)\
+                     .filter(models.Post.post_type == 'need_team' and models.Post.u_id == currentuser.u_id).all()\
+ 
+    group_responses = db.session.query(models.GroupResponse, models.ProjectAssignment.description, models.Groups.group_name, models.GroupResponse.message)\
+                      .join(models.Post)\
+                      .join(models.Groups)\
+                      .join(models.ProjectAssignment)\
+                      .filter(models.Post.post_id == models.GroupResponse.post_id and models.Post.post_type == 'need_team').all()
+
+    print "USER RESPONSE:"
+    for resp in user_responses:
+        print resp.description
+        print resp.name
+        print resp.message
+    print "GROUP RESPONSE:"
+    for resp in group_responses:
+        print resp.description
+        print resp.name
+        print resp.message
+        
+            
+
+    return render_template('user-inbox.html', user_responses=user_responses, group_responses=group_responses)
+
 @app.template_filter('pluralize')
 def pluralize(number, singular='', plural='s'):
     return singular if number in (0, 1) else plural
