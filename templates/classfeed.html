@@ -2,7 +2,7 @@
 {% block heading %}Feeds for: {{course.course_name}} section {{section.section_number}} {% endblock %}
 {% block content %}
 {% if assignments|length > 0 %}
-<p>Select an assignment:</p><form name="assignments" action="{{ url_for('getPosts', course_name=course.course_name, section_number=section.section_number) }}"  method="POST">
+<p>Select an assignment:</p><form name="assignments" action="{{ url_for('getPosts', course_code=course.course_code, section_number=section.section_number) }}"  method="POST">
    <select name="selected_assignment">
    {% for assignment in assignments %}
    <option value ="{{ assignment.assignment_id }}">{{assignment.description}}</option>

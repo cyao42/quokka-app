@@ -86,24 +86,13 @@ class University(db.Model):
 
 class Post(db.Model):
     __tablename__ = 'post'
-    post_id = db.Column('u_id', db.Integer(), primary_key=True)
+    post_id = db.Column('post_id', db.Integer(), primary_key=True)
     assignment_id = db.Column('assignment_id', db.Integer(), db.ForeignKey('projectassignment.assignment_id'), primary_key=True) 
     section_id = db.Column('section_id', db.Integer(), db.ForeignKey('section.section_id'), primary_key=True) 
     u_id = db.Column('u_id', db.Integer(), db.ForeignKey('users.u_id'))
     post_type = db.Column('post_type', db.String(100))
     message = db.Column('message', db.String(1000))
     time_posted = db.Column('time_posted', db.String())
-
-class NeedTeamPost(db.Model):
-    __tablename__ = 'needteampost'
-    assignment_id = db.Column('assignment_id', db.Integer(), db.ForeignKey('projectassignment.assignment_id'), primary_key=True)   
-      
-
-class NeedMemberPost(db.Model):
-    __tablename__ = 'needmemberpost'
-    assignment_id = db.Column('assignment_id', db.Integer(), db.ForeignKey('projectassignment.assignment_id'), primary_key=True)   
-    g_id = db.Column('g_id', db.Integer(), db.ForeignKey('groups.g_id'), primary_key=True)
-
 
 class ProjectAssignment(db.Model):
     __tablename__ = 'projectassignment'
