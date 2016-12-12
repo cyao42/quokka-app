@@ -1,6 +1,7 @@
 from sqlalchemy import sql, orm, join
 from sqlalchemy.sql import text 
 from app import db
+import datetime
 
 class Users(db.Model):
     __tablename__ = 'users'
@@ -191,3 +192,42 @@ class StudyingFor(db.Model):
     __tablename__ = 'studyingfor'
     g_id = db.Column('g_id', db.Integer(), db.ForeignKey('groups.g_id'), primary_key=True)
     section_id = db.Column('section_id', db.Integer(), db.ForeignKey('section.section_id'), primary_key=True)
+
+class GroupResponse(db.Model):
+    __tablename__ = 'groupresponse'
+    post_id = db.Column('post_id', db.Integer(), db.ForeignKey('post.post_id'), primary_key=True)
+    g_id = db.Column('g_id', db.Integer(), db.ForeignKey('groups.g_id'), primary_key=True)
+    section_id = db.Column('section_id', db.Integer(), db.ForeignKey('section.section_id'), primary_key=True)
+    time_posted = db.Column('time_posted', db.String(100))
+    message = db.Column('message', db.String(1000))
+    approved = db.Column('approved', db.Boolean())
+    @staticmethod
+    def addNew(post_id, g_id, section_id, message):
+        try:
+            time = str(datetime.datetime.now())
+            db.session.execute('INSERT INTO groupresponse VALUES(:post_id, :g_id, :section_id, :time_posted, :message, :approved)',
+                               dict(post_id=post_id, g_id=g_id, section_id=section_id, time_posted=time, message=message, approved=False))
+            db.session.commit()
+        except Exception as e:
+            db.session.rollback()
+            raise e
+
+class UserResponse(db.Model):
+    __tablename__ = 'userresponse'
+    post_id = db.Column('post_id', db.Integer(), db.ForeignKey('post.post_id'), primary_key=True)
+    u_id = db.Column('u_id', db.Integer(), db.ForeignKey('users.u_id'), primary_key=True)
+    section_id = db.Column('section_id', db.Integer(), db.ForeignKey('section.section_id'), primary_key=True)
+    time_posted = db.Column('time_posted', db.String())
+    message = db.Column('message', db.String(1000))
+    approved = db.Column('approved', db.Boolean())
+    @staticmethod
+    def addNew(post_id, u_id, section_id, message):
+        try:
+            time = str(datetime.datetime.now())
+            db.session.execute('INSERT INTO userresponse VALUES(:post_id, :u_id, :section_id, :time_posted, :m\
+essage, :approved)',
+                               dict(post_id=post_id, u_id=u_id, section_id=section_id, time_posted=time, message=message, approved=False))
+            db.session.commit()
+        except Exception as e:
+            db.session.rollback()
+            raise e

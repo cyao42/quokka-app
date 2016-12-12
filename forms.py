@@ -96,3 +96,9 @@ class AssignmentNewFormFactory:
             setattr(F, field_name, BooleanField(default=default))
         return F()
 
+class ResponseFormFactory:
+    @staticmethod
+    def form():
+        class F(FlaskForm):
+            message = TextAreaField()
+        return F()

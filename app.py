@@ -268,18 +268,63 @@ def new_assignment():
             .join(models.RegisteredWith)\
             .filter(models.RegisteredWith.u_id == currentuser.u_id)
     form = forms.AssignmentNewFormFactory.form(sections)
-    print "IS FORM VALIDATED?"
     if form.validate_on_submit():
-        print "VALIDATED!!!"
         try:
             form.errors.pop('database', None)
-            models.ProjectAssignment.addNew(form.get_sections(), form.max_members.data, form.date_assigned.data, form.date_due.data, form.description.data)
+            models.ProjectAssignment.addNew(form.get_sections(),form.max_members.data,form.date_assigned.data,form.date_due.data,form.description.data)
             return redirect('/profile')
         except BaseException as e:
             form.errors['database'] = str(e)
             return render_template('new-assignment.html', form=form)
     else:
         return render_template('new-assignment.html', form=form)
+
+@app.route('/respond/<id>', methods=['GET', 'POST'])
+def respond_post(id):
+    global currentuser
+    #check for if person is logged in
+    if not currentuser:
+        return redirect('/')
+    post = db.session.query(models.Post)\
+              .filter(models.Post.post_id == id).first()
+    isRegistered = db.session.query(models.RegisteredWith)\
+                   .filter(models.RegisteredWith.section_id == post.section_id and models.RegisteredWith.u_id == currentuser.u_id)
+    # if not in class, redirect to profile
+    if not isRegistered:
+        return redirect('/profile')
+    else:
+        assignment = db.session.query(models.ProjectAssignment)\
+                     .filter(models.ProjectAssignment.assignment_id == post.assignment_id).first()
+        # if user in group, find it
+        group_from = db.session.query(models.Groups)\
+                .join(models.MemberOf)\
+                .filter(models.MemberOf.u_id == currentuser.u_id)\
+                .join(models.WorkingOn)\
+                .filter(models.WorkingOn.assignment_id == post.assignment_id).first()
+        user_to = db.session.query(models.Users)\
+                    .filter(models.Users.u_id == post.u_id).first()
+        group_to = None
+        if post.post_type == 'need_member':
+            group_to = db.session.query(models.Groups)\
+                       .join(models.MemberOf)\
+                       .filter(models.MemberOf.u_id == user_to.u_id)\
+                       .join(models.WorkingOn)\
+                       .filter(models.WorkingOn.assignment_id == post.assignment_id).first()
+
+        form = forms.ResponseFormFactory().form();
+        if form.validate_on_submit():
+            try:
+                form.errors.pop('database', None)
+                if group_from:
+                    models.GroupResponse.addNew(post.post_id, group_from.g_id, post.section_id, form.message.data)
+                else:
+                    models.UserResponse.addNew(post.post_id, currentuser.u_id, post.section_id, form.message.data)
+                return redirect(url_for('classfeed', id=post.assignment_id))
+            except BaseException as e:
+                form.errors['database'] = str(e)
+                return render_template('response.html', form=form, user_from=currentuser.name, user_to=user_to.name, group_from=group_from, group_to=group_to, id=id, assignment=assignment)
+        else:
+            return render_template('response.html', form=form, user_from=currentuser.name, user_to=user_to.name, group_from=group_from, group_to=group_to, id=id, assignment=assignment)
 
 @app.route('/membersof/<g_id>')
 def membersOf(g_id):
@@ -289,6 +334,35 @@ def membersOf(g_id):
     group = db.session.query(models.Groups)\
             .filter(models.Groups.g_id == g_id).first()
     return render_template('membersof.html', member=member, group=group)
+
+@app.route('/my_inbox/')
+def inbox():
+    user_responses = db.session.query(models.UserResponse, models.ProjectAssignment.description, models.Users.name, models.UserResponse.message)\
+                     .join(models.Post)\
+                     .join(models.Users, models.Users.u_id == models.UserResponse.u_id)\
+                     .join(models.ProjectAssignment)\
+                     .filter(models.Post.post_type == 'need_team' and models.Post.u_id == currentuser.u_id).all()\
+ 
+    group_responses = db.session.query(models.GroupResponse, models.ProjectAssignment.description, models.Groups.group_name, models.GroupResponse.message)\
+                      .join(models.Post)\
+                      .join(models.Groups)\
+                      .join(models.ProjectAssignment)\
+                      .filter(models.Post.post_id == models.GroupResponse.post_id and models.Post.post_type == 'need_team').all()
+
+    print "USER RESPONSE:"
+    for resp in user_responses:
+        print resp.description
+        print resp.name
+        print resp.message
+    print "GROUP RESPONSE:"
+    for resp in group_responses:
+        print resp.description
+        print resp.name
+        print resp.message
+        
+            
+
+    return render_template('user-inbox.html', user_responses=user_responses, group_responses=group_responses)
 
 @app.template_filter('pluralize')
 def pluralize(number, singular='', plural='s'):

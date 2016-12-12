@@ -1,0 +1,8 @@
+{% extends 'layout.html' %}
+{% block heading %}Inbox: {% endblock %}
+{% block content %}
+{% for response in responses %}
+<p>From:  {{user_from}} {% if group_from %}from {{group_from.group_name}}{% endif %}</p>
+{% endfor %}
+
+{% endblock %}

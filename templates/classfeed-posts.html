@@ -28,8 +28,9 @@
       {% for post in posts %}
       <div id="post">
         <h6>{{post.time_posted}}</h6>
-        <h3>{{post.u_id}} {{post.post_type}} </h3>
-        <h4>{{post.message}}</h4>
+        <p>{{post.message}}</p>
+	      <p>{{post.post_id}} {{post.assignment_id}} {{post.section_id}} {{post.u_id}} {{post.post_type}}</p>
+	      <a href="{{url_for('respond_post', id=post.post_id)}}">Respond to this post!</a>
       </div>
       {% endfor %}
     </div>	

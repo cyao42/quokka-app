@@ -15,3 +15,5 @@
 \COPY StudyGroup(g_id, name) FROM 'data/StudyGroup.dat' WITH DELIMITER ',' NULL '' CSV
 \COPY WorkingOn(g_id, assignment_id) FROM 'data/WorkingOn.dat' WITH DELIMITER ',' NULL '' CSV
 \COPY StudyingFor(g_id, section_id) FROM 'data/StudyingFor.dat' WITH DELIMITER ',' NULL '' CSV
+\COPY GroupResponse(post_id, g_id, section_id, time_posted, message, approved) FROM 'data/GroupResponse.dat' WITH DELIMITER ',' NULL '' CSV
+\COPY UserResponse(post_id, u_id, section_id, time_posted, message, approved) FROM 'data/UserResponse.dat' WITH DELIMITER ',' NULL '' CSV
