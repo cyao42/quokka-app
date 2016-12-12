@@ -26,6 +26,8 @@
       <div id="post">
         <h6>{{post.time_posted}}</h6>
         <p>{{post.message}}</p>
+	<p>{{post.post_id}} {{post.assign_id}} {{post.section_id}} {{post.u_id}} {{post.type}}</p>
+	<a href="{{url_for('respond_posts', id=post.post_id)}}">Respond to this post!</a>
       </div>
       {% endfor %}
     </div>	
