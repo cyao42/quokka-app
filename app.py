@@ -319,7 +319,7 @@ def respond_post(id):
                     models.GroupResponse.addNew(post.post_id, group_from.g_id, post.section_id, form.message.data)
                 else:
                     models.UserResponse.addNew(post.post_id, currentuser.u_id, post.section_id, form.message.data)
-                return redirect(url_for('/profile'))
+                return redirect('/profile')
             except BaseException as e:
                 form.errors['database'] = str(e)
                 return render_template('response.html', form=form, user_from=currentuser.name, user_to=user_to.name, group_from=group_from, group_to=group_to, id=id, assignment=assignment)
@@ -339,7 +339,32 @@ def membersOf(g_id):
     assign = "Study Group"
     if(group_type):
         assign = group_type.description
-    return render_template('membersof.html', member=member, group=group, assign=assign)
+    return render_template('membersof.html', member=member, group=group, assign=assign, id=g_id)
+
+@app.route('/<id>/inbox', methods=['GET', 'POST'])
+def group_inbox(id):
+    # find members of group and all posts made by them
+    # figure out the assignment and if user is in group with that assignment
+    # find all user/group responses with that id
+    assignment = db.session.query(models.WorkingOn)\
+                 .filter(models.WorkingOn.g_id == id).first()
+
+    user_responses = db.session.query(models.UserResponse, models.UserResponse.message, models.Users.name, models.UserResponse.time_posted, models.UserResponse.u_id, models.Post.post_id)\
+                     .join(models.Post)\
+                     .filter(models.Post.assignment_id == assignment.assignment_id and models.Post.post_type == 'need_member')\
+                     .join(models.Users, models.Users.u_id == models.UserResponse.u_id)\
+                     .join(models.MemberOf, models.MemberOf.u_id == models.Post.u_id and models.MemberOf.g_id == id).all()
+
+    for u_r in user_responses:
+        print u_r.name+" "+u_r.message
+    if request.method == 'POST':
+        for u_r in user_responses:
+            key = str(u_r.post_id)+" "+str(u_r.u_id)
+            if request.form[key] == 'Accept':
+                models.MemberOf.addNew(u_r.u_id, id)
+            elif request.form[key] == 'Reject':
+                print "CALL REJECT"
+    return render_template('group-inbox.html', user_responses=user_responses, id=id)
 
 @app.route('/my_inbox', methods=['GET', 'POST'])
 def inbox():
@@ -354,7 +379,6 @@ def inbox():
                       .join(models.Groups)\
                       .join(models.ProjectAssignment)\
                       .filter(models.Post.post_id == models.GroupResponse.post_id and models.Post.post_type == 'need_team').all()
-
     if request.method == 'POST':
         for u_r in user_responses:
             key = str(u_r.post_id)+" "+str(u_r.u_id)
