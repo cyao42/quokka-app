@@ -371,7 +371,7 @@ def respond_post(id):
                     models.GroupResponse.addNew(post.post_id, group_from.g_id, post.section_id, form.message.data)
                 else:
                     models.UserResponse.addNew(post.post_id, currentuser.u_id, post.section_id, form.message.data)
-                return redirect('/profile')
+                return redirect(url_for('getAllPosts', section_id=post.section_id, assignment_id=post.assignment_id))
             except BaseException as e:
                 form.errors['database'] = str(e)
                 return render_template('response.html', form=form, user_from=currentuser.name, user_to=user_to.name, group_from=group_from, group_to=group_to, id=id, assignment=assignment)
@@ -407,25 +407,25 @@ def group_inbox(id):
                      .join(models.Users, models.Users.u_id == models.UserResponse.u_id)\
                      .join(models.MemberOf, models.MemberOf.u_id == models.Post.u_id and models.MemberOf.g_id == id).all()
 
-    for u_r in user_responses:
-        print u_r.name+" "+u_r.message
     if request.method == 'POST':
         for u_r in user_responses:
             key = str(u_r.post_id)+" "+str(u_r.u_id)
             if request.form[key] == 'Accept':
                 models.MemberOf.addNew(u_r.u_id, id)
+                models.UserResponse.remove(u_r.post_id, u_r.u_id)
                 return redirect(url_for('membersOf', g_id=id))
             elif request.form[key] == 'Reject':
-                print "CALL REJECT"
+                models.UserResponse.remove(u_r.post_id, u_r.u_id)
+                return redirect(url_for('group_inbox', id=id))
     return render_template('group-inbox.html', user_responses=user_responses, id=id)
 
 @app.route('/my_inbox', methods=['GET', 'POST'])
 def inbox():
     user_responses = db.session.query(models.UserResponse, models.ProjectAssignment.description, models.Users.name, models.UserResponse.u_id, models.UserResponse.post_id, models.UserResponse.message, models.UserResponse.time_posted, models.Post.assignment_id, models.Post.section_id)\
-                     .join(models.Post)\
+                     .join(models.Post, models.Post.post_id == models.UserResponse.post_id)\
+                     .filter(models.UserResponse.u_id != currentuser.u_id and models.Post.u_id == currentuser.u_id and models.Post.post_type == 'need_team')\
                      .join(models.Users, models.Users.u_id == models.UserResponse.u_id)\
-                     .join(models.ProjectAssignment)\
-                     .filter(models.Post.post_type == 'need_team' and models.Post.u_id == currentuser.u_id).all()\
+                     .join(models.ProjectAssignment).all()\
  
     group_responses = db.session.query(models.GroupResponse, models.ProjectAssignment.description, models.Groups.group_name, models.GroupResponse.g_id, models.GroupResponse.post_id, models.GroupResponse.message, models.GroupResponse.time_posted)\
                       .join(models.Post)\
@@ -437,17 +437,20 @@ def inbox():
             key = str(u_r.post_id)+" "+str(u_r.u_id)
             if request.form[key] == 'Accept':
                 models.Groups.addNewTwoUsers(request.form["group_name"], u_r.section_id, u_r.assignment_id, currentuser.u_id, u_r.u_id)
+                models.UserResponse.remove(u_r.post_id, u_r.u_id)
                 return redirect('/profile')
             elif request.form[key] == 'Reject':
-                print "CALL REJECT"
+                models.UserResponse.remove(u_r.post_id, u_r.u_id)
+                return redirect('/my_inbox')
         for g_r in group_responses:
             key = str(g_r.post_id)+" "+str(g_r.g_id)
             if request.form[key] == 'Accept':
                 models.MemberOf.addNew(currentuser.u_id, g_r.g_id)
+                models.GroupResponse.remove(g_r.post_id, g_r.g_id)
                 return redirect(url_for('memberOf', g_id=g_r.g_id))
             elif request.form[key] == 'Reject':
-                print "CALL REJECT"
-        
+                models.GroupResponse.remove(g_r.post_id, g_r.g_id)
+                return redirect('/my_inbox')
     return render_template('user-inbox.html', user_responses=user_responses, group_responses=group_responses)
 
 @app.template_filter('pluralize')

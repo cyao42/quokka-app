@@ -311,6 +311,15 @@ class GroupResponse(db.Model):
         except Exception as e:
             db.session.rollback()
             raise e
+    @staticmethod
+    def remove(post_id, g_id):
+        try:
+            db.session.execute('DELETE FROM userresponse WHERE post_id = :post_id AND g_id = :g_id',
+            dict(post_id=post_id, g_id=g_id))
+            db.session.commit()
+        except Exception as e:
+            db.session.rollback()
+            raise e
 
 class UserResponse(db.Model):
     __tablename__ = 'userresponse'
@@ -327,6 +336,15 @@ class UserResponse(db.Model):
             db.session.execute('INSERT INTO userresponse VALUES(:post_id, :u_id, :section_id, :time_posted, :m\
 essage, :approved)',
                                dict(post_id=post_id, u_id=u_id, section_id=section_id, time_posted=time, message=message, approved=False))
+            db.session.commit()
+        except Exception as e:
+            db.session.rollback()
+            raise e
+    @staticmethod
+    def remove(post_id, u_id):
+        try:
+            db.session.execute('DELETE FROM userresponse WHERE post_id = :post_id AND u_id = :u_id',
+                               dict(post_id=post_id, u_id=u_id))
             db.session.commit()
         except Exception as e:
             db.session.rollback()
