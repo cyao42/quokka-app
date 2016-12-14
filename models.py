@@ -178,17 +178,16 @@ class Post(db.Model):
 class ProjectAssignment(db.Model):
     __tablename__ = 'projectassignment'
     assignment_id = db.Column('assignment_id', db.Integer(), primary_key=True)
-    max_members = db.Column('max_members', db.Integer())
     date_assigned = db.Column('date_assigned', db.String(20))
     date_due = db.Column('date_due', db.String(20))
     description = db.Column('description', db.String(1000))
     posts = orm.relationship('Post')
     @staticmethod
-    def addNew(sections, max_mem, assigned, due, desc):
+    def addNew(sections, assigned, due, desc):
         try:
             a_id = db.session.query(ProjectAssignment).count()+1
-            db.session.execute('INSERT INTO projectassignment VALUES(:assignment_id, :max_members, :date_assigned, :date_due, :description)',
-                           dict(assignment_id=a_id, max_members=max_mem, date_assigned=assigned, date_due=due, description=desc))
+            db.session.execute('INSERT INTO projectassignment VALUES(:assignment_id, :date_assigned, :date_due, :description)',
+                           dict(assignment_id=a_id, date_assigned=assigned, date_due=due, description=desc))
             for section in sections:
                 db.session.execute('INSERT INTO assignedto VALUES(:assignment_id, :section_id)',
                     dict(assignment_id=a_id, section_id=int(section)))

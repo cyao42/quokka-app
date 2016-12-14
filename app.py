@@ -287,7 +287,7 @@ def new_assignment():
     if form.validate_on_submit():
         try:
             form.errors.pop('database', None)
-            models.ProjectAssignment.addNew(form.get_sections(),form.max_members.data,form.date_assigned.data,form.date_due.data,form.description.data)
+            models.ProjectAssignment.addNew(form.get_sections(),form.date_assigned.data,form.date_due.data,form.description.data)
             return redirect('/profile')
         except BaseException as e:
             form.errors['database'] = str(e)

@@ -99,7 +99,6 @@ class AssignmentNewFormFactory:
                 for s_id, s_name, s_field in self.section_fields():
                     if s_field.data:
                         yield s_id
-            max_members = IntegerField()
             date_assigned = StringField()
             date_due = StringField()
             description = TextAreaField()
