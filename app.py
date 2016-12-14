@@ -362,6 +362,7 @@ def group_inbox(id):
             key = str(u_r.post_id)+" "+str(u_r.u_id)
             if request.form[key] == 'Accept':
                 models.MemberOf.addNew(u_r.u_id, id)
+                return redirect(url_for('membersOf', g_id=id))
             elif request.form[key] == 'Reject':
                 print "CALL REJECT"
     return render_template('group-inbox.html', user_responses=user_responses, id=id)
@@ -383,16 +384,15 @@ def inbox():
         for u_r in user_responses:
             key = str(u_r.post_id)+" "+str(u_r.u_id)
             if request.form[key] == 'Accept':
-                print request.form["group_name"]
-                print currentuser.u_id
-                print u_r.u_id
                 models.Groups.addNewTwoUsers(request.form["group_name"], u_r.section_id, u_r.assignment_id, currentuser.u_id, u_r.u_id)
+                return redirect('/profile')
             elif request.form[key] == 'Reject':
                 print "CALL REJECT"
         for g_r in group_responses:
             key = str(g_r.post_id)+" "+str(g_r.g_id)
             if request.form[key] == 'Accept':
                 models.MemberOf.addNew(currentuser.u_id, g_r.g_id)
+                return redirect(url_for('memberOf', g_id=g_r.g_id))
             elif request.form[key] == 'Reject':
                 print "CALL REJECT"
         
