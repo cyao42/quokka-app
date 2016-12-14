@@ -82,7 +82,6 @@ CREATE TABLE Add
 
 CREATE TABLE ProjectAssignment
 (assignment_id INTEGER NOT NULL PRIMARY KEY,
- max_members INTEGER,
  date_assigned VARCHAR(20),
  date_due VARCHAR(20),
  description VARCHAR(1000)

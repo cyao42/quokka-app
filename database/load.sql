@@ -8,7 +8,7 @@
 \COPY Section(section_id, section_number, course_code, course_semester, university_name, university_location) FROM 'data/Section.dat' WITH DELIMITER ',' NULL '' CSV
 \COPY RegisteredWith(u_id, section_id) FROM 'data/RegisteredWith.dat' WITH DELIMITER ',' NULL '' CSV
 \COPY Add(j_id, g_id, message, approved, sent_by, sent_to) FROM 'data/Add.dat' WITH DELIMITER ',' NULL '' CSV
-\COPY ProjectAssignment(assignment_id, max_members, date_assigned, date_due, description) FROM 'data/ProjectAssignment.dat' WITH DELIMITER ',' NULL '' CSV
+\COPY ProjectAssignment(assignment_id, date_assigned, date_due, description) FROM 'data/ProjectAssignment.dat' WITH DELIMITER ',' NULL '' CSV
 \COPY AssignedTo(assignment_id, section_id) FROM 'data/AssignedTo.dat' WITH DELIMITER ',' NULL '' CSV
 \COPY Post(post_id, assignment_id, section_id, u_id, post_type, message, time_posted) FROM 'data/Post.dat' WITH DELIMITER ',' NULL '' CSV
 \COPY ProjectGroup(g_id, name) FROM 'data/ProjectGroup.dat' WITH DELIMITER ',' NULL '' CSV

@@ -9,10 +9,9 @@
     <li>{{s_name}}: {{field}}</li>
   </ul>
   {% endfor %}
-  <p>Max Members: {{form.max_members}}</p>
   <p>Date Assigned: {{form.date_assigned}}</p>
   <p>Date Due: {{form.date_due}}</p>
-  <p>Description: {{form.description}}</p>
+  <p>Assignment Name/Description: {{form.description}}</p>
 
   <p>{% if msg %}{{msg}}{% endif %}</p>
   <input type="submit" value="Submit"/>
