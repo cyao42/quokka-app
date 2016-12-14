@@ -10,6 +10,7 @@
     <br>
       <h2>{{assign}}</h2>
      <div class="groups">
+  <a href="{{url_for('group_inbox', id=id)}}">Go to inbox!</a>
   {% for m in member %}
   <div class="information">
   <p>{{m.name}}</p>
@@ -19,7 +20,6 @@
   <p>Major 2: {{m.second_major}}</p>
   <p>Grad Year: {{m.grad_year}}</p>
   </div>
-  <a href="{{url_for('group_inbox', id=id)}}">Go to inbox!</a>
   {% endfor %}
      </div>
   </body>
