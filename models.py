@@ -332,7 +332,7 @@ class GroupResponse(db.Model):
     @staticmethod
     def remove(post_id, g_id):
         try:
-            db.session.execute('DELETE FROM userresponse WHERE post_id = :post_id AND g_id = :g_id',
+            db.session.execute('DELETE FROM groupresponse WHERE post_id = :post_id AND g_id = :g_id',
             dict(post_id=post_id, g_id=g_id))
             db.session.commit()
         except Exception as e:

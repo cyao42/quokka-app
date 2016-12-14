@@ -38,6 +38,9 @@
 		<div class="course">
 		<li>Class: {{classThing.course_pre}} {{classThing.course_code}} {{classThing.course_name}}</li>
 		<p>Section: {{classThing.section_number}}</p>
+		{% if isStudent == false %}
+		<p>Section Id: {{classThing.section_id}} => Give this for your students to register. </p>
+		{% endif %}
 		<p>Semester: {{classThing.course_semester}}</p>
 		<p>@ {{classThing.university_name}}</p>
 		{% for assign in assignments %}
