@@ -116,6 +116,14 @@ def createPost(assignment_id, section_id):
     else:
         return render_template('new-post.html', form=form, assignment_id=assignment_id, section_id=section_id)
 
+@app.route('/delete-post/<section_id>/<assignment_id>/<post_id>', methods=['GET', 'POST'])
+def deletePost(section_id, assignment_id, post_id):
+    try: 
+        models.Post.deletePost(post_id, currentuser.u_id)
+        return redirect(url_for('getAllPosts', section_id=section_id, assignment_id = assignment_id))
+    except BaseException as e: 
+        return redirect(url_for('getAllPosts', section_id=section_id, assignment_id = assignment_id))
+
 @app.route('/register-class', methods=['GET', 'POST'])
 def register_class():
     global currentuser
@@ -236,7 +244,7 @@ def getPosts(section_id):
                 .filter(models.ProjectAssignment.assignment_id == assignment_id).one()
     posts = db.session.query(models.Post)\
             .filter(models.Post.section_id==section.section_id, models.Post.assignment_id==assignment_id)
-    return render_template('classfeed-posts.html', posts=posts, assignment=assignment, course=course, section=section)
+    return render_template('classfeed-posts.html', posts=posts, assignment=assignment, course=course, section=section, currentuser=currentuser)
 
 @app.route('/posts/<section_id>/<assignment_id>/all', methods=['GET', 'POST'])
 def getAllPosts(section_id, assignment_id): 
@@ -248,7 +256,7 @@ def getAllPosts(section_id, assignment_id):
                 .filter(models.ProjectAssignment.assignment_id == assignment_id).one()
     posts = db.session.query(models.Post)\
             .filter(models.Post.section_id==section.section_id, models.Post.assignment_id==assignment_id)
-    return render_template('classfeed-posts.html', posts=posts, assignment=assignment, course=course, section=section)
+    return render_template('classfeed-posts.html', posts=posts, assignment=assignment, course=course, section=section, currentuser=currentuser)
 
 @app.route('/posts/<section_id>/<assignment_id>/need_member', methods=['GET', 'POST'])
 def getNeedMemberPosts(section_id, assignment_id): 
@@ -260,7 +268,7 @@ def getNeedMemberPosts(section_id, assignment_id):
                 .filter(models.ProjectAssignment.assignment_id == assignment_id).one()
     posts = db.session.query(models.Post)\
             .filter(models.Post.section_id==section.section_id, models.Post.assignment_id==assignment_id, models.Post.post_type=="need_member")
-    return render_template('classfeed-posts.html', posts=posts, assignment=assignment, course=course, section=section)
+    return render_template('classfeed-posts.html', posts=posts, assignment=assignment, course=course, section=section, currentuser=currentuser)
 
 @app.route('/posts/<section_id>/<assignment_id>/need_team', methods=['GET', 'POST'])
 def getNeedTeamPosts(section_id, assignment_id): 
@@ -272,7 +280,7 @@ def getNeedTeamPosts(section_id, assignment_id):
                 .filter(models.ProjectAssignment.assignment_id == assignment_id).one()
     posts = db.session.query(models.Post)\
             .filter(models.Post.section_id==section.section_id, models.Post.assignment_id==assignment_id, models.Post.post_type=="need_team")
-    return render_template('classfeed-posts.html', posts=posts, assignment=assignment, course=course, section=section)
+    return render_template('classfeed-posts.html', posts=posts, assignment=assignment, course=course, section=section, currentuser=currentuser)
 
 @app.route('/new-assignment', methods=['GET', 'POST'])
 def new_assignment():
