@@ -323,6 +323,12 @@ def edit_prof():
             form.errors.pop('database', None)
             models.Users.editUser(form.name.data,form.phone.data,form.email.data,currentuser.u_id)
             if isStudent:
+                if form.grad_year.data == '':
+                    form.grad_year.data = None
+                if form.first_major.data == '':
+                    form.first_major.data = None
+                if form.second_major.data == '':
+                    form.second_major.data = None
                 models.Student.editStudent(form.name.data,form.phone.data,form.email.data,currentuser.u_id,form.first_major.data,form.second_major.data,form.grad_year.data)
             else:
                 models.Professor.editProf(form.name.data,form.phone.data,form.email.data,currentuser.u_id)

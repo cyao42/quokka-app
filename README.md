@@ -44,6 +44,8 @@ In your browser (in VM), go to localhost:5000 if you are in VM or go to your ext
 
 In the vm terminal where you’re free to type, vim config.py and make sure in the SQLALCHEMY_DATABASE_URI that between that you either replace vagrant with your cloud username or keep vagrant there (if you’re using vagrant). 
 
+*** Note: We created 3 short videos which demo our app's features and abilities. Here is the link to the folder with these videos in the duke box:
+https://duke.box.com/s/4hom7iw2aba65rqfjik8ylz6nq76o0s4 ***
 
 Once the Quokka home page loads, you can register as a user. You can register as either a student or a professor. If you’re a professor, your profile will look different and you’ll be able to add classes and assignments. If you’re a student, your profile will allow you to enroll into classes and add groups. 
 
