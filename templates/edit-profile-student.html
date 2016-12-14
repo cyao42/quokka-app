@@ -1,0 +1,47 @@
+{% extends 'layout.html' %}
+{% block heading %}Update Profile: {% endblock %}
+{% block content %}
+<form action="/edit-profile" method="POST">
+  {{form.csrf_token}}
+  <p>
+    name: {{form.name}}
+    {% if form.name.errors %}
+    <ul>{% for error in form.name.errors %}<li>{{error}}</li>{% endfor %}</ul>
+    {% endif %}
+  </p>
+  <p>
+    email: {{form.email}}
+    {% if form.email.errors %}
+    <ul>{% for error in form.email.errors %}<li>{{error}}</li>{% endfor %}</ul>
+    {% endif %}
+  </p>
+  <p>
+    phone: {{form.phone}}
+    {% if form.phone.errors %}
+    <ul>{% for error in form.phone.errors %}<li>{{error}}</li>{% endfor %}</ul>
+    {% endif %}
+  </p>
+  <p>
+    first major: {{form.first_major}}
+    {% if form.first_major.errors %}
+    <ul>{% for error in form.first_major.errors %}<li>{{error}}</li>{% endfor %}</ul>
+    {% endif %}
+  </p>
+  <p>
+    second_major: {{form.second_major}}
+    {% if form.second_major.errors %}
+    <ul>{% for error in form.second_major.errors %}<li>{{error}}</li>{% endfor %}</ul>
+    {% endif %}
+  </p>
+  <p>
+    graduation year: {{form.grad_year}}
+    {% if form.grad_year.errors %}
+    <ul>{% for error in form.grad_year.errors %}<li>{{error}}</li>{% endfor %}</ul>
+    {% endif %}
+  </p>
+  <hr/>
+  <input type="reset" value="Reset"/>
+  <input type="submit" value="Submit"/>
+  {% if 'database' in form.errors %}<p>{{form.errors['database']}}</p>{% endif %}
+</form>
+{% endblock %}

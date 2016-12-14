@@ -13,6 +13,7 @@
 <p>Graduation Year: {{user.grad_year}}</p>
 <a href="/my_inbox">See Inbox!</a>
 {% endif %}
+<p>Edit your profile<a href="/edit-profile"> here</a>!</p>
 
 <div class="listings">
 	{% if isStudent %}
@@ -39,9 +40,16 @@
 		<p>Section: {{classThing.section_number}}</p>
 		<p>Semester: {{classThing.course_semester}}</p>
 		<p>@ {{classThing.university_name}}</p>
+		{% for assign in assignments %}
+			{% if assign.section_id == classThing.section_id %}
+			<li>Assignment: (Id) {{assign.assignment_id}} (Due) {{assign.date_due}} => {{assign.description}}</li> 
+			{% endif %}
+		{% endfor %}
 		{% if isStudent %}
 		<p><a href="{{url_for('classfeed', id=classThing.section_id)}}"> See Posts, Meet Mates!</a></p>
 		<a href="{{url_for('new_group', sectionid=classThing.section_id)}}">Add Group</a>
+		{% else %}
+		<p><a href="{{url_for('classfeed', id=classThing.section_id)}}"> See Posts</a></p>
 		{% endif %}
 		<br></br>
 		</div>
