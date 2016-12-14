@@ -1,4 +1,4 @@
-from sqlalchemy import sql, orm, join
+from sqlalchemy import sql, orm, join, func
 from sqlalchemy.sql import text 
 from app import db
 import datetime
@@ -164,11 +164,30 @@ class Post(db.Model):
     @staticmethod
     def addNew(assignment_id, section_id, u_id, looking_for, message, time_posted):
         try:
-            post_id = db.session.query(Post).count()+1
-            post_id = int(post_id)
+            #post_id = db.session.query(Post).count()+1
+            max_post_id = db.session.query(db.func.max(Post.post_id)).scalar()
+            post_id = int(max_post_id) + 1
             section_id = int(section_id)
             db.session.execute('INSERT INTO post VALUES(:post_id, :assignment_id, :section_id, :u_id, :post_type, :message, :time_posted)',
                                dict(post_id = post_id, assignment_id=assignment_id, section_id=section_id,u_id=u_id,post_type=looking_for,message=message,time_posted=time_posted))
+            db.session.commit()
+        except Exception as e:
+            db.session.rollback()
+            raise e
+    @staticmethod
+    def deletePost(post_id, u_id):
+        post = db.session.query(Post)\
+                .filter(Post.post_id == post_id).one()
+        if (post.post_type == 'need_team'):
+            try: 
+                UserResponse.remove(post_id, u_id)
+            except Exception as e:
+                GroupResponse.remove(post_id, u_id)
+        elif (post.post_type == 'need_member'):
+            UserResponse.remove(post_id, u_id)
+        try: 
+            db.session.execute('DELETE FROM post WHERE post_id = :post_id', 
+                                dict(post_id = post_id))
             db.session.commit()
         except Exception as e:
             db.session.rollback()
